@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Sensors",
     platforms: [
-        SupportedPlatform.iOS(.v13),
+        SupportedPlatform.iOS(.v12),
         SupportedPlatform.watchOS(SupportedPlatform.WatchOSVersion.v6)
     ],
     products: [
