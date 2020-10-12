@@ -13,13 +13,13 @@ public protocol LMHealthKitSensorObserver: class {
     func onHKDataFetch(for type: String, error: Error?)
 }
 
-public class LMHealthKitSensor {
+public class LMHealthKitSensor: ISensorController {
     
     // MARK: - VARIABLES
     
     public weak var observer: LMHealthKitSensorObserver?
     public var healthStore : HKHealthStore
-    public var fetchLimit = 100
+    //public var fetchLimit = 100
     
     //HKQuantityData
     private var arrQuantityData = [LMHealthKitQuantityData]()
@@ -100,8 +100,8 @@ extension LMHealthKitSensor {
         }
         
         let dataTypes = Set(lampHealthKitTypes())
-        healthStore.requestAuthorization(toShare: nil, read: dataTypes) { (success, error) -> Void in
-            if let observer = self.observer {
+        healthStore.requestAuthorization(toShare: nil, read: dataTypes) { [weak self] (success, error) -> Void in
+            if let observer = self?.observer {
                 observer.onHKAuthorizationStatusChanged(success: success, error: error)
             }
         }
@@ -295,29 +295,34 @@ extension LMHealthKitSensor {
     private func healthKitData(for type: HKSampleType, from start: Date?) {
         
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
-        let quantityQuery = HKSampleQuery(sampleType: type, predicate: nil, limit: 1, sortDescriptors: [sortDescriptor]) { (query, sampleObjects, error) in
+        
+        let today = Date()
+        let fromDate = start ?? Calendar.current.date(byAdding: .minute, value: -10, to: today)
+        let predicate = HKQuery.predicateForSamples(withStart: fromDate, end: today, options: HKQueryOptions.strictEndDate)
+        
+        let quantityQuery = HKSampleQuery(sampleType: type, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { [weak self] (query, sampleObjects, error) in
             
             guard let type = query.objectType as? HKSampleType else { return }
             
             if error != nil {
-                self.observer?.onHKDataFetch(for: type.identifier, error: error)
+                self?.observer?.onHKDataFetch(for: type.identifier, error: error)
                 return
             }
             if let samples = sampleObjects as? [HKQuantitySample] {
                 
-                self.saveQuantityData(samples, for: type)
+                self?.saveQuantityData(samples, for: type)
                 let lastDate = samples.last?.endDate ?? Date()
-                self.saveLastRecordedDate(lastDate, for: type)
+                self?.saveLastRecordedDate(lastDate, for: type)
             } else if let samples = sampleObjects as? [HKCategorySample] {
                 
-                self.saveCategoryData(samples, for: type)
+                self?.saveCategoryData(samples, for: type)
                 let lastDate = samples.last?.endDate ?? Date()
-                self.saveLastRecordedDate(lastDate, for: type)
+                self?.saveLastRecordedDate(lastDate, for: type)
             } else if let samples = sampleObjects as? [HKWorkout] {
                 
-                self.saveWorkoutData(samples, for: type)
+                self?.saveWorkoutData(samples, for: type)
                 let lastDate = samples.last?.endDate ?? Date()
-                self.saveLastRecordedDate(lastDate, for: type)
+                self?.saveLastRecordedDate(lastDate, for: type)
             }
         }
         healthStore.execute(quantityQuery)

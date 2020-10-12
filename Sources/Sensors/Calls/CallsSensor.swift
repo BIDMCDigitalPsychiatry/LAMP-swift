@@ -7,27 +7,6 @@
 //import UIKit
 import CallKit
 
-
-extension Notification.Name {
-    public static let actionLampCalls   = Notification.Name(CallsSensor.ACTION_LAMP_CALLS)
-    public static let actionLampCallsStart    = Notification.Name(CallsSensor.ACTION_LAMP_CALLS_START)
-    public static let actionLampCallsStop    = Notification.Name(CallsSensor.ACTION_LAMP_CALLS_STOP)
-    public static let actionLampCallsSync    = Notification.Name(CallsSensor.ACTION_LAMP_CALLS_SYNC)
-    public static let actionLampCallsSyncCompletion = Notification.Name(CallsSensor.ACTION_LAMP_CALLS_SYNC_COMPLETION)
-    public static let actionLampCallsSetLabel = Notification.Name(CallsSensor.ACTION_LAMP_CALLS_SET_LABEL)
-    
-    // TODO: check all of actions
-    public static let actionLampCallAccepted = Notification.Name(CallsSensor.ACTION_LAMP_CALL_ACCEPTED)        // o
-    public static let actionLampCallRinging = Notification.Name(CallsSensor.ACTION_LAMP_CALL_RINGING)          // o
-    public static let actionLampCallMissed = Notification.Name(CallsSensor.ACTION_LAMP_CALL_MISSED)            // ?
-    public static let actionLampCallVoiceMailed = Notification.Name(CallsSensor.ACTION_LAMP_CALL_VOICE_MAILED) // x
-    public static let actionLampCallRejected = Notification.Name(CallsSensor.ACTION_LAMP_CALL_REJECTED)        // x
-    public static let actionLampCallBlocked = Notification.Name(CallsSensor.ACTION_LAMP_CALL_BLOCKED)          // ?
-    public static let actionLampCallMade = Notification.Name(CallsSensor.ACTION_LAMP_CALL_MADE)                // o
-    public static let actionLampCallUserInCall = Notification.Name(CallsSensor.ACTION_LAMP_USER_IN_CALL)       // o
-    public static let actionLampCallUserNoInCall = Notification.Name(CallsSensor.ACTION_LAMP_USER_NOT_IN_CALL) // o
-}
-
 public protocol CallsObserver {
     /**
      * Callback when a call event is recorded (received, made, missed)
@@ -60,67 +39,6 @@ public protocol CallsObserver {
 
 public class CallsSensor: NSObject, ISensorController {
 
-    public static let TAG = "LAMP::Calls"
-    
-    /**
-     * Fired event: call accepted by the user
-     */
-    public static let ACTION_LAMP_CALL_ACCEPTED = "ACTION_LAMP_CALL_ACCEPTED"
-    
-    /**
-     * Fired event: phone is ringing
-     */
-    public static let ACTION_LAMP_CALL_RINGING = "ACTION_LAMP_CALL_RINGING"
-    
-    /**
-     * Fired event: call unanswered
-     */
-    public static let ACTION_LAMP_CALL_MISSED = "ACTION_LAMP_CALL_MISSED"
-    
-    /**
-     * Fired event: call got voice mailed.
-     * Only available after SDK 21
-     */
-    public static let ACTION_LAMP_CALL_VOICE_MAILED = "ACTION_LAMP_CALL_VOICE_MAILED"
-    
-    /**
-     * Fired event: call got rejected by the callee
-     * Only available after SDK 24
-     */
-    public static let ACTION_LAMP_CALL_REJECTED = "ACTION_LAMP_CALL_REJECTED"
-    
-    /**
-     * Fired event: call got blocked.
-     * Only available after SDK 24
-     */
-    public static let ACTION_LAMP_CALL_BLOCKED = "ACTION_LAMP_CALL_BLOCKED"
-    
-    /**
-     * Fired event: call attempt by the user
-     */
-    public static let ACTION_LAMP_CALL_MADE = "ACTION_LAMP_CALL_MADE"
-    
-    /**
-     * Fired event: user IS in a call at the moment
-     */
-    public static let ACTION_LAMP_USER_IN_CALL = "ACTION_LAMP_USER_IN_CALL"
-    
-    /**
-     * Fired event: user is NOT in a call
-     */
-    public static let ACTION_LAMP_USER_NOT_IN_CALL = "ACTION_LAMP_USER_NOT_IN_CALL"
-    
-    public static let ACTION_LAMP_CALLS = "com.lampframework.ios.sensor.calls"
-    public static let ACTION_LAMP_CALLS_START = "com.lampframework.ios.sensor.calls.SENSOR_START"
-    public static let ACTION_LAMP_CALLS_STOP = "com.lampframework.ios.sensor.calls.SENSOR_STOP"
-    
-    public static let ACTION_LAMP_CALLS_SET_LABEL = "com.lampframework.ios.sensor.calls.SET_LABEL"
-    public static let EXTRA_LABEL = "label"
-    
-    public static let ACTION_LAMP_CALLS_SYNC = "com.lampframework.ios.sensor.calls.SENSOR_SYNC"
-    public static let ACTION_LAMP_CALLS_SYNC_COMPLETION = "com.lampframework.ios.sensor.calls.SENSOR_SYNC_COMPLETION"
-//    public static let EXTRA_STATUS = "status"
-//    public static let EXTRA_ERROR = "error"
     
     public enum CallEventType: Int {
         case incoming  = 1
@@ -166,22 +84,13 @@ public class CallsSensor: NSObject, ISensorController {
         if callObserver == nil {
             callObserver = CXCallObserver()
             callObserver!.setDelegate(self, queue: nil)
-            self.notificationCenter.post(name: .actionLampCallsStart, object: self)
         }
     }
     
     public func stop() {
         if callObserver != nil {
             callObserver = nil
-            self.notificationCenter.post(name: .actionLampCallsStop, object: self)
         }
-    }
-
-    public func set(label:String){
-        self.CONFIG.label = label
-        self.notificationCenter.post(name: .actionLampCallsSetLabel,
-                                     object: self,
-                                     userInfo: [CallsSensor.EXTRA_LABEL:label])
     }
 }
 
@@ -208,7 +117,6 @@ extension CallsSensor: CXCallObserverDelegate {
             if let observer = self.CONFIG.sensorObserver{
                 observer.onFree(number: call.uuid.uuidString)
             }
-            self.notificationCenter.post(name: .actionLampCallUserNoInCall, object: self)
             self.save(call:call)
         }
 
@@ -217,7 +125,6 @@ extension CallsSensor: CXCallObserverDelegate {
             if let observer = self.CONFIG.sensorObserver{
                 observer.onRinging(number: call.uuid.uuidString)
             }
-            self.notificationCenter.post(name: .actionLampCallMade, object: self)
             lastCallEventType = CallEventType.outgoing.rawValue
         }
         
@@ -226,7 +133,6 @@ extension CallsSensor: CXCallObserverDelegate {
             if let observer = self.CONFIG.sensorObserver{
                 observer.onRinging(number: call.uuid.uuidString)
             }
-            self.notificationCenter.post(name: .actionLampCallRinging, object: self)
             lastCallEventType = CallEventType.incoming.rawValue
         }
         
@@ -235,8 +141,8 @@ extension CallsSensor: CXCallObserverDelegate {
             if let observer = self.CONFIG.sensorObserver{
                 observer.onBusy(number: call.uuid.uuidString)
             }
-            self.notificationCenter.post(name: .actionLampCallAccepted, object: self)
-            self.notificationCenter.post(name: .actionLampCallUserInCall, object: self)
+            //self.notificationCenter.post(name: .actionLampCallAccepted, object: self)
+            //self.notificationCenter.post(name: .actionLampCallUserInCall, object: self)
             lastCallEvent = call
             lastCallEventTime = Date()
             if call.isOutgoing {
@@ -247,22 +153,18 @@ extension CallsSensor: CXCallObserverDelegate {
         }
     }
     
-    public func save(call:CXCall){
+    public func save(call: CXCall){
         if let uwLastCallEvent = self.lastCallEvent,
            let uwLastCallEventTime = self.lastCallEventTime,
            let uwLastCallEventType = self.lastCallEventType{
             let now = Date()
             let data = CallsData()
+            data.timestamp = Date().timeInMilliSeconds
             data.trace = uwLastCallEvent.uuid.uuidString
-            data.eventTimestamp = Int64( now.timeIntervalSince1970*1000 )
             data.duration = Int64(now.timeIntervalSince1970 - uwLastCallEventTime.timeIntervalSince1970)
             data.type = uwLastCallEventType
-            data.label = self.CONFIG.label
 
-            if let observer = self.CONFIG.sensorObserver {
-                observer.onCall(data: data)
-            }
-            self.notificationCenter.post(name: .actionLampCalls, object: self)
+            self.CONFIG.sensorObserver?.onCall(data: data)
             // data.type = eventType
             self.lastCallEvent = nil
             lastCallEventTime = nil

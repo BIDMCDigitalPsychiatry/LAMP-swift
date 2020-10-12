@@ -7,10 +7,10 @@ import Foundation
 
 open class SensorConfig{
     
-    public var enabled:Bool    = false
-    public var debug:Bool      = false
-    public var label:String    = ""
-    public var deviceId:String = ""
+    public var enabled: Bool    = false
+    public var debug: Bool      = false
+    public var label: String    = ""
+    public var deviceId: String = ""
     
     public init(){
         

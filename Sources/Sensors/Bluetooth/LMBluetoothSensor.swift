@@ -8,7 +8,7 @@
 import CoreBluetooth
 import Foundation
 
-public class LMBluetoothSensor: NSObject {
+public class LMBluetoothSensor: NSObject, ISensorController {
         
     // MARK: Variables
     var centralManager: CBCentralManager!

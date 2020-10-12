@@ -11,14 +11,13 @@ public class LampSensorCoreObject {
     
     public var timestamp: Int64 = Int64(Date().timeIntervalSince1970*1000)
     public var label : String = ""
-    public var timezone: Int = LampSensorCoreUtils.getTimeZone()
+    //public var timezone: Int = LampSensorCoreUtils.getTimeZone()
     //public var os: String = "ios"
     //public var jsonVersion: Int = 0
     
     open func toDictionary() -> Dictionary<String, Any> {
         let dict = ["timestamp":timestamp,
-                    "label"    :label,
-                    "timezone" :timezone] as [String : Any]
+                    "label"    :label] as [String : Any]
                     //"os"       :os,
                     //"jsonVersion":jsonVersion] as [String : Any]
         return dict

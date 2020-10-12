@@ -9,7 +9,7 @@ public protocol ISensorController {
     var  id: String {get}
     func start()
     func stop()
-    func set(label:String)
+    //func set(label:String)
     var notificationCenter: NotificationCenter {get}
 }
 

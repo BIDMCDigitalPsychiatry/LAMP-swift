@@ -13,19 +13,4 @@ public class LampSensorCoreUtils {
         let secondsFromGMT = TimeZone.current.secondsFromGMT()
         return secondsFromGMT/60/60 // convert a secounds -> hours
     }
-        
-    /**
-     * Remove "http://" and "https://" if the protocol is included in the "host" name.
-     */
-    public static func cleanHostName(_ hostName:String) -> String {
-        var newHostName = hostName;
-        if let range = newHostName.range(of: "http://") {
-            newHostName.removeSubrange(range)
-        }
-        
-        if let range = newHostName.range(of: "https://") {
-            newHostName.removeSubrange(range)
-        }
-        return newHostName
-    }
 }

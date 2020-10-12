@@ -32,7 +32,7 @@ public class PedometerSensor: ISensorController {
             }
         }
         
-        public var sensorObserver:PedometerObserver?
+        public var sensorObserver: PedometerObserver?
         
         public override init() {
             super.init()
@@ -159,7 +159,6 @@ public class PedometerSensor: ISensorController {
                         if let observer = self.CONFIG.sensorObserver {
                             observer.onPedometerChanged(data: data)
                         }
-                        
 
                         self.setLastUpdateDateTime(toDate)
                         let diffBetweenNowAndToDate = now.minutes(from: toDate)
@@ -179,7 +178,7 @@ public class PedometerSensor: ISensorController {
 }
 
 public protocol PedometerObserver {
-    func onPedometerChanged(data:PedometerData)
+    func onPedometerChanged(data: PedometerData)
 }
 
 extension Date {

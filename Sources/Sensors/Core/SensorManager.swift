@@ -114,10 +114,4 @@ public class SensorManager {
             sensor.stop()
         }
     }
-    
-    public func set(label:String){
-        for sensor in sensors {
-            sensor.set(label: label)
-        }
-    }
 }
