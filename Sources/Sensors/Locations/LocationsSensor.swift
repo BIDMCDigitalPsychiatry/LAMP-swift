@@ -150,18 +150,16 @@ extension LocationsSensor: CLLocationManagerDelegate {
             if abs(newestLocation.timestamp.timeIntervalSinceNow) < 60 {
                 let locationStamp = newestLocation.timestamp.timeIntervalSince1970
                 if (locationStamp - lastStoredTime) > CONFIG.minimumInterval {
-                    self.saveLocations(locations, eventTime: nil)
+                    self.saveLocations(newestLocation, eventTime: newestLocation.timestamp)
                     lastStoredTime = locationStamp
                 }
             }
         }
     }
     
-    func saveLocations(_ locations: [CLLocation], eventTime:Date?){
+    func saveLocations(_ location: CLLocation, eventTime: Date?){
 
-        if let location = locations.last {
-            CONFIG.sensorObserver?.onLocationChanged(data: LocationsData(location))
-        }
+        CONFIG.sensorObserver?.onLocationChanged(data: LocationsData(location, eventTime: eventTime) )
     }
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

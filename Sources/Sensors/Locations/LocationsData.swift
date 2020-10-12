@@ -11,8 +11,8 @@ public struct LocationsData {
     public var latitude:  Double
     public var longitude: Double
     
-    init(_ location: CLLocation) {
-        timestamp = Date().timeInMilliSeconds
+    init(_ location: CLLocation, eventTime: Date?) {
+        timestamp = eventTime ?? Date().timeInMilliSeconds
         altitude = location.altitude
         latitude = location.coordinate.latitude
         longitude = location.coordinate.longitude
