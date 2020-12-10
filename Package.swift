@@ -1,13 +1,13 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.2
 import PackageDescription
 
 let package = Package(
     name: "LAMP",
     platforms: [
-        .iOS(.v9),
+        .iOS(.v12),
         .macOS(.v10_11),
         .tvOS(.v9),
-        .watchOS(.v3)
+        .watchOS(.v6)
     ],
     products: [
         .library(
