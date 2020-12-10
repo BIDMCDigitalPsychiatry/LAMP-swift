@@ -1,12 +1,21 @@
-//
-//  ActivitySensor.swift
-//  
-//
-//  Created by ZCO Engineer on 26/11/20.
-//
-
 import Foundation
 import CoreMotion
+
+public class ActivityData {
+    
+    public var timestamp: Double
+    public var activity: CMMotionActivity
+    
+    init(_ activity: CMMotionActivity) {
+        self.activity = activity
+        timestamp = Date().timeIntervalSince1970 * 1000
+    }
+    
+    init(_ activity: CMMotionActivity, timeStamp: TimeInterval) {
+        self.activity = activity
+        self.timestamp = timeStamp * 1000
+    }
+}
 
 public protocol ActivitySensorObserver: class {
     func onDataChanged(data: ActivityData)

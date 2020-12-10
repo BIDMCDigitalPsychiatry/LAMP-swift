@@ -1,13 +1,27 @@
-//
-//  Wifi.swift
-//  mindLAMP Consortium
-//
-
 #if !os(watchOS)
-//import UIKit 
 
 import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
+
+
+public class WiFiDeviceData {
+
+    public var macAddress: String?
+    public var bssid: String?
+    public var ssid: String?
+
+}
+
+public class WiFiScanData {
+    
+    public var timestamp = Date().timeIntervalSince1970 * 1000
+    public var bssid: String = ""
+    public var ssid: String  = ""
+    
+    public var security: String = ""
+    public var frequency: Int = 0
+    public var rssi: Int = 0
+}
 
 public protocol WiFiObserver: class {
     func onWiFiAPDetected(data: WiFiScanData)

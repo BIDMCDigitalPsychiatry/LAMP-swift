@@ -1,14 +1,36 @@
-//
-//  MotionSensor.swift
-//  
-//
-//  mindLAMP Consortium
-//
 import Foundation
 import CoreMotion
 import UIKit
 //https://developer.apple.com/documentation/coremotion/cmmotionmanager?language=objc
 //https://developer.apple.com/videos/play/wwdc2017/704/ 10:00
+
+public struct DeviceAttitude {
+    public var roll: Double
+    public var pitch: Double
+    public var yaw: Double
+}
+
+public class MotionData {
+    
+    public var timestamp: Double
+    
+    public var acceleration: CMAcceleration
+    public var rotationRate: CMRotationRate
+    //public var magneticField: CMMagneticField
+    public var gravity: CMAcceleration
+    public var deviceAttitude: DeviceAttitude
+    
+    init(_ deviceMotion: CMDeviceMotion) {
+        
+        timestamp = Date().timeIntervalSince1970 * 1000
+        self.acceleration = deviceMotion.userAcceleration
+        self.rotationRate = deviceMotion.rotationRate
+        //self.magneticField = deviceMotion.magneticField.field//we can check accuracy here
+        self.gravity = deviceMotion.gravity
+        self.deviceAttitude = DeviceAttitude(roll: deviceMotion.attitude.roll, pitch: deviceMotion.attitude.pitch, yaw: deviceMotion.attitude.yaw)
+    }
+}
+
 
 public class MotionSensor: ISensorController {
     

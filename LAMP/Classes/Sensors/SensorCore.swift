@@ -1,9 +1,72 @@
-//
-//  SensorManager.swift
-//  mindLAMP Consortium
-//
+import Foundation
 
-//import UIKit
+protocol TextPresentation {
+    var stringValue: String? {get}
+}
+
+
+public protocol ISensorController {
+    var  id: String {get}
+    func start()
+    func stop()
+    var notificationCenter: NotificationCenter {get}
+}
+
+extension ISensorController {
+    public var notificationCenter: NotificationCenter {
+        return NotificationCenter.default
+    }
+    
+    public var  id: String {
+        return UUID.init().uuidString
+    }
+}
+
+public class LampSensorCoreObject {
+    
+    public var timestampInternal: Int64 = Int64(Date().timeIntervalSince1970*1000)
+    open func toDictionary() -> Dictionary<String, Any> {
+        let dict = ["timestamp": timestampInternal]
+        return dict
+    }
+    public init() {}
+}
+
+
+open class SensorConfig{
+    
+    public var enabled: Bool    = false
+    public var debug: Bool      = false
+    public var label: String    = ""
+    public var deviceId: String = ""
+    
+    public init(){
+        
+    }
+    
+    public convenience init(_ config:Dictionary<String,Any>){
+        self.init()
+        self.set(config: config)
+    }
+    
+    open func set(config:Dictionary<String,Any>){
+        if let enabled = config["enabled"] as? Bool{
+            self.enabled = enabled
+        }
+        
+        if let debug = config["debug"] as? Bool {
+            self.debug = debug
+        }
+        
+        if let label = config["label"] as? String {
+            self.label = label
+        }
+
+        if let deviceId = config["deviceId"] as? String {
+            self.deviceId = deviceId
+        }
+    }
+}
 
 public class SensorManager {
     
@@ -100,5 +163,27 @@ public class SensorManager {
         for sensor in sensors {
             sensor.stop()
         }
+    }
+}
+
+class Utils {
+    static let shared = Utils()
+    private init() {}
+    
+    private let timestampKey = "LMPedometerTimestamp"
+    
+    func getHealthKitLaunchedTimestamp() -> Date {
+        let userDefaults = UserDefaults.standard
+        if let date = userDefaults.object(forKey: timestampKey) as? Date {
+            return date
+        }
+        let newDate = Date().addingTimeInterval(-10 * 60)
+        userDefaults.set(newDate, forKey: timestampKey)
+        return newDate
+    }
+    
+    func removeAllSavedDates() {
+        let userDefaults = UserDefaults.standard
+        userDefaults.removeObject(forKey: timestampKey)
     }
 }

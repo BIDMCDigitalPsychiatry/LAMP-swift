@@ -1,9 +1,22 @@
-//
-//  PedometerSensor.swift
-//  mindLAMP Consortium
-//
-
 import CoreMotion
+
+public class PedometerData: LampSensorCoreObject {
+
+    public var startDate: Double = 0
+    public var endDate: Double  = 0
+    public var frequencySpeed: Double  = 0
+    public var numberOfSteps: Int   = 0
+    public var distance: Double        = 0
+    public var currentPace: Double     = 0
+    public var currentCadence: Double  = 0
+    public var floorsAscended: Int  = 0
+    public var floorsDescended: Int = 0
+    public var averageActivePace: Double = 0
+    
+    public var timestamp: Double {
+        return endDate
+    }
+}
 
 public class PedometerSensor: ISensorController {
     
@@ -71,8 +84,8 @@ public class PedometerSensor: ISensorController {
                 // save pedometer data
                 if let pedoData = pedometerData {
                     let data = PedometerData()
-                    data.startDate = pedoData.startDate.timeInMilliSeconds
-                    data.endDate = pedoData.endDate.timeInMilliSeconds
+                    data.startDate = pedoData.startDate.timeIntervalSince1970 * 1000
+                    data.endDate = pedoData.endDate.timeIntervalSince1970 * 1000
                     data.numberOfSteps = pedoData.numberOfSteps.intValue
                     if let currentCadence = pedoData.currentCadence{
                         data.currentCadence = currentCadence.doubleValue

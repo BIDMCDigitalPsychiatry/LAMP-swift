@@ -1,11 +1,12 @@
-//
-//  CallsSensor.swift
-//  mindLAMP Consortium
-//
-
 #if !os(watchOS)
-//import UIKit
 import CallKit
+
+public class CallsData {
+    public var timestamp: Double = 0
+    public var type: Int = -1
+    public var duration: Int64 = 0
+    public var trace:String? = nil
+}
 
 public protocol CallsObserver: class {
     /**
@@ -162,7 +163,7 @@ extension CallsSensor: CXCallObserverDelegate {
             
             let now = Date()
             let data = CallsData()
-            data.timestamp = Date().timeInMilliSeconds
+            data.timestamp = Date().timeIntervalSince1970 * 1000
             data.trace = uwLastCallEvent.uuid.uuidString
             data.duration = Int64(now.timeIntervalSince1970 - uwLastCallEventTime.timeIntervalSince1970)
             data.type = uwLastCallEventType

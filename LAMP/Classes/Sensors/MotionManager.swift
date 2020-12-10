@@ -1,9 +1,3 @@
-//
-//  MotionManager.swift
-//  
-//
-//  mindLAMP Consortium
-//
 import Foundation
 import CoreMotion
 import UIKit
