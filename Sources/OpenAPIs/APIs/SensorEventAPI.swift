@@ -198,35 +198,7 @@ open class SensorEventAPI {
      - returns: AnyPublisher<String, Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func sensorEventCreate(participantId: String, sensorEvent: SensorEvent<SensorDataModel>, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<String, Error> {
-        return Future<String, Error>.init { promisse in
-            sensorEventCreateWithRequestBuilder(participantId: participantId, sensorEvent: sensorEvent).execute(apiResponseQueue) { result -> Void in
-                switch result {
-                case let .success(response):
-                    promisse(.success(response.body!))
-                case let .failure(error):
-                    promisse(.failure(error))
-                }
-            }
-        }.eraseToAnyPublisher()
-    }
-    
-    //this is for posting multiple sensor events at a time
-    open class func sensorEventCreate(participantId: String, sensorEvents: SensorData.Request, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<String, Error> {
-        return Future<String, Error>.init { promisse in
-            sensorEventCreateWithRequestBuilder(participantId: participantId, sensorEvents: sensorEvents).execute(apiResponseQueue) { result -> Void in
-                switch result {
-                case let .success(response):
-                    promisse(.success(response.body!))
-                case let .failure(error):
-                    promisse(.failure(error))
-                }
-            }
-        }.eraseToAnyPublisher()
-    }
-
-    //This func is used for login, logout, and for sending devicetoken when register APNS
-    public static func logInOutEventCreate(participantId: String, sensorEvent: SensorEvent<DeviceInfoWithToken>, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<String, Error> {
+    open class func sensorEventCreate<T: Encodable>(participantId: String, sensorEvent: T, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<String, Error> {
         return Future<String, Error>.init { promisse in
             sensorEventCreateWithRequestBuilder(participantId: participantId, sensorEvent: sensorEvent).execute(apiResponseQueue) { result -> Void in
                 switch result {
@@ -264,7 +236,7 @@ open class SensorEventAPI {
      - parameter sensorEvent: (body)
      - returns: RequestBuilder<String>
      */
-    public static func sensorEventCreateWithRequestBuilder<T: Encodable>(participantId: String, sensorEvent: SensorEvent<T>) -> RequestBuilder<String> {
+    public static func sensorEventCreateWithRequestBuilder<T: Encodable>(participantId: String, sensorEvent: T) -> RequestBuilder<String> {
         var path = "/participant/{participant_id}/sensor_event"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -278,20 +250,7 @@ open class SensorEventAPI {
         
         return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
     }
-    public static func sensorEventCreateWithRequestBuilder(participantId: String, sensorEvents: SensorData.Request) -> RequestBuilder<String> {
-        var path = "/participant/{participant_id}/sensor_event"
-        let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
-        let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        path = path.replacingOccurrences(of: "{participant_id}", with: participantIdPostEscape, options: .literal, range: nil)
-        let URLString = OpenAPIClientAPI.basePath + path
-        let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: sensorEvents)
-        
-        let url = URLComponents(string: URLString)
-        
-        let requestBuilder: RequestBuilder<String>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
-        
-        return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
-    }
+
     public static func sensorEventCreateWithRequestBuilder(participantId: String, sensorEvent: [String: Any]) -> RequestBuilder<String> {
         var path = "/participant/{participant_id}/sensor_event"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
