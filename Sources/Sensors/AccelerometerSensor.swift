@@ -162,9 +162,5 @@ public class LMSensorRecorder {
                 }
                 return nil
             }
-//        } else {
-//            startReadingAccelorometerData()
-//        }
-        return nil
     }
 }

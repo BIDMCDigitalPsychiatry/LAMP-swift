@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 /** The ActivitySpec determines the parameters and properties of an Activity and its corresponding generated ActivityEvents. */
 public struct ActivitySpec: Codable {

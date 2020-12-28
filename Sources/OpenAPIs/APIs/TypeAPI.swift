@@ -13,8 +13,8 @@ import Combine
 open class TypeAPI {
     /**
 
-     - parameter typeId: (path)  
-     - parameter attachmentKey: (path)  
+     - parameter typeId: (path)
+     - parameter attachmentKey: (path)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<Any, Error>
      */
@@ -35,13 +35,13 @@ open class TypeAPI {
     /**
      - GET /type/{type_id}/attachment/{attachment_key}
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter typeId: (path)  
-     - parameter attachmentKey: (path)  
-     - returns: RequestBuilder<Any> 
+     - parameter typeId: (path)
+     - parameter attachmentKey: (path)
+     - returns: RequestBuilder<Any>
      */
-    open class func typeGetAttachmentWithRequestBuilder(typeId: String, attachmentKey: String) -> RequestBuilder<Any> {
+    open class func typeGetAttachmentWithRequestBuilder(typeId: String, attachmentKey: String) -> RequestBuilder<AnyCodable> {
         var path = "/type/{type_id}/attachment/{attachment_key}"
         let typeIdPreEscape = "\(APIHelper.mapValueToPathItem(typeId))"
         let typeIdPostEscape = typeIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -50,22 +50,22 @@ open class TypeAPI {
         let attachmentKeyPostEscape = attachmentKeyPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{attachment_key}", with: attachmentKeyPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         let url = URLComponents(string: URLString)
 
-        let requestBuilder: RequestBuilder<Any>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<AnyCodable>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
 
     /**
 
-     - parameter typeId: (path)  
-     - parameter attachmentKey: (path)  
-     - parameter invokeAlways: (query)  
-     - parameter includeLogs: (query)  
-     - parameter ignoreOutput: (query)  
+     - parameter typeId: (path)
+     - parameter attachmentKey: (path)
+     - parameter invokeAlways: (query)
+     - parameter includeLogs: (query)
+     - parameter ignoreOutput: (query)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<Any, Error>
      */
@@ -86,16 +86,16 @@ open class TypeAPI {
     /**
      - GET /type/{type_id}/attachment/dynamic/{attachment_key}
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter typeId: (path)  
-     - parameter attachmentKey: (path)  
-     - parameter invokeAlways: (query)  
-     - parameter includeLogs: (query)  
-     - parameter ignoreOutput: (query)  
-     - returns: RequestBuilder<Any> 
+     - parameter typeId: (path)
+     - parameter attachmentKey: (path)
+     - parameter invokeAlways: (query)
+     - parameter includeLogs: (query)
+     - parameter ignoreOutput: (query)
+     - returns: RequestBuilder<Any>
      */
-    open class func typeGetDynamicAttachmentWithRequestBuilder(typeId: String, attachmentKey: String, invokeAlways: Bool, includeLogs: Bool, ignoreOutput: Bool) -> RequestBuilder<Any> {
+    open class func typeGetDynamicAttachmentWithRequestBuilder(typeId: String, attachmentKey: String, invokeAlways: Bool, includeLogs: Bool, ignoreOutput: Bool) -> RequestBuilder<AnyCodable> {
         var path = "/type/{type_id}/attachment/dynamic/{attachment_key}"
         let typeIdPreEscape = "\(APIHelper.mapValueToPathItem(typeId))"
         let typeIdPostEscape = typeIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -104,23 +104,23 @@ open class TypeAPI {
         let attachmentKeyPostEscape = attachmentKeyPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{attachment_key}", with: attachmentKeyPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
-            "invoke_always": invokeAlways.encodeToJSON(), 
-            "include_logs": includeLogs.encodeToJSON(), 
+            "invoke_always": invokeAlways.encodeToJSON(),
+            "include_logs": includeLogs.encodeToJSON(),
             "ignore_output": ignoreOutput.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<Any>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<AnyCodable>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
 
     /**
 
-     - parameter typeId: (path)  
+     - parameter typeId: (path)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<Any, Error>
      */
@@ -141,22 +141,22 @@ open class TypeAPI {
     /**
      - GET /type/{type_id}/attachment
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter typeId: (path)  
-     - returns: RequestBuilder<Any> 
+     - parameter typeId: (path)
+     - returns: RequestBuilder<Any>
      */
-    open class func typeListAttachmentsWithRequestBuilder(typeId: String) -> RequestBuilder<Any> {
+    open class func typeListAttachmentsWithRequestBuilder(typeId: String) -> RequestBuilder<AnyCodable> {
         var path = "/type/{type_id}/attachment"
         let typeIdPreEscape = "\(APIHelper.mapValueToPathItem(typeId))"
         let typeIdPostEscape = typeIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{type_id}", with: typeIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         let url = URLComponents(string: URLString)
 
-        let requestBuilder: RequestBuilder<Any>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<AnyCodable>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -164,7 +164,7 @@ open class TypeAPI {
     /**
      Find the owner(s) of the resource.
      
-     - parameter typeId: (path)  
+     - parameter typeId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
@@ -188,11 +188,11 @@ open class TypeAPI {
      - GET /type/{type_id}/parent
      - Get the parent type identifier of the data structure referenced by the identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter typeId: (path)  
+     - parameter typeId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<String> 
+     - returns: RequestBuilder<String>
      */
     open class func typeParentWithRequestBuilder(typeId: String, transform: String? = nil) -> RequestBuilder<String> {
         var path = "/type/{type_id}/parent"
@@ -214,16 +214,16 @@ open class TypeAPI {
 
     /**
 
-     - parameter typeId: (path)  
-     - parameter target: (path)  
-     - parameter attachmentKey: (path)  
-     - parameter body: (body)  
+     - parameter typeId: (path)
+     - parameter target: (path)
+     - parameter attachmentKey: (path)
+     - parameter body: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<Any, Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func typeSetAttachment(typeId: String, target: String, attachmentKey: String, body: Any, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<Any, Error> {
-        return Future<Any, Error>.init { promise in
+    open class func typeSetAttachment(typeId: String, target: String, attachmentKey: String, body: AnyCodable, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<AnyCodable, Error> {
+        return Future<AnyCodable, Error>.init { promise in
             typeSetAttachmentWithRequestBuilder(typeId: typeId, target: target, attachmentKey: attachmentKey, body: body).execute(apiResponseQueue) { result -> Void in
                 switch result {
                 case let .success(response):
@@ -238,15 +238,15 @@ open class TypeAPI {
     /**
      - PUT /type/{type_id}/attachment/{attachment_key}/{target}
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter typeId: (path)  
-     - parameter target: (path)  
-     - parameter attachmentKey: (path)  
-     - parameter body: (body)  
-     - returns: RequestBuilder<Any> 
+     - parameter typeId: (path)
+     - parameter target: (path)
+     - parameter attachmentKey: (path)
+     - parameter body: (body)
+     - returns: RequestBuilder<Any>
      */
-    open class func typeSetAttachmentWithRequestBuilder(typeId: String, target: String, attachmentKey: String, body: Any) -> RequestBuilder<Any> {
+    open class func typeSetAttachmentWithRequestBuilder(typeId: String, target: String, attachmentKey: String, body: AnyCodable) -> RequestBuilder<AnyCodable> {
         var path = "/type/{type_id}/attachment/{attachment_key}/{target}"
         let typeIdPreEscape = "\(APIHelper.mapValueToPathItem(typeId))"
         let typeIdPostEscape = typeIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -262,18 +262,18 @@ open class TypeAPI {
 
         let url = URLComponents(string: URLString)
 
-        let requestBuilder: RequestBuilder<Any>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<AnyCodable>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "PUT", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
     }
 
     /**
 
-     - parameter typeId: (path)  
-     - parameter target: (path)  
-     - parameter attachmentKey: (path)  
-     - parameter invokeOnce: (query)  
-     - parameter dynamicAttachment: (body)  
+     - parameter typeId: (path)
+     - parameter target: (path)
+     - parameter attachmentKey: (path)
+     - parameter invokeOnce: (query)
+     - parameter dynamicAttachment: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<Any, Error>
      */
@@ -294,16 +294,16 @@ open class TypeAPI {
     /**
      - PUT /type/{type_id}/attachment/dynamic/{attachment_key}/{target}
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter typeId: (path)  
-     - parameter target: (path)  
-     - parameter attachmentKey: (path)  
-     - parameter invokeOnce: (query)  
-     - parameter dynamicAttachment: (body)  
-     - returns: RequestBuilder<Any> 
+     - parameter typeId: (path)
+     - parameter target: (path)
+     - parameter attachmentKey: (path)
+     - parameter invokeOnce: (query)
+     - parameter dynamicAttachment: (body)
+     - returns: RequestBuilder<Any>
      */
-    open class func typeSetDynamicAttachmentWithRequestBuilder(typeId: String, target: String, attachmentKey: String, invokeOnce: Bool, dynamicAttachment: DynamicAttachment) -> RequestBuilder<Any> {
+    open class func typeSetDynamicAttachmentWithRequestBuilder(typeId: String, target: String, attachmentKey: String, invokeOnce: Bool, dynamicAttachment: DynamicAttachment) -> RequestBuilder<AnyCodable> {
         var path = "/type/{type_id}/attachment/dynamic/{attachment_key}/{target}"
         let typeIdPreEscape = "\(APIHelper.mapValueToPathItem(typeId))"
         let typeIdPostEscape = typeIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -322,7 +322,7 @@ open class TypeAPI {
             "invoke_once": invokeOnce.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<Any>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<AnyCodable>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "PUT", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
     }

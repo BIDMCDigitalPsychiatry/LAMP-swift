@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 /** A specific sub-detail of a &#x60;ActivityEvent&#x60; that contains specific  interaction information that comprises the parent &#x60;ActivityEvent&#x60;. */
 public struct TemporalSlice: Codable {

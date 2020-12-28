@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AnyCodable
 
 /** An activity that may be performed by a participant in a study. */
 public struct Activity: Codable {

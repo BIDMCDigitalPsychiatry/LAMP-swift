@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 /** A participant within a study; a participant cannot be enrolled in more than one study at a time. */
 public struct Participant: Codable {
@@ -33,7 +33,7 @@ public struct Participant: Codable {
         self.helpline = helpline
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable { 
+    public enum CodingKeys: String, CodingKey, CaseIterable {
         case id
         case studyCode = "study_code"
         case language

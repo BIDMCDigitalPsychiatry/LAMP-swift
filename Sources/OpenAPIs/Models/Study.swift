@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 public struct Study: Codable {
 
@@ -15,11 +15,11 @@ public struct Study: Codable {
     /** The name of the study. */
     public var name: String?
     /** The set of all activities available in the study. */
-    public var activities: [Any]?
+    public var activities: [AnyCodable]?
     /** The set of all enrolled participants in the study. */
-    public var participants: [Any]?
+    public var participants: [AnyCodable]?
 
-    public init(id: String? = nil, name: String? = nil, activities: [Any]? = nil, participants: [Any]? = nil) {
+    public init(id: String? = nil, name: String? = nil, activities: [AnyCodable]? = nil, participants: [AnyCodable]? = nil) {
         self.id = id
         self.name = name
         self.activities = activities

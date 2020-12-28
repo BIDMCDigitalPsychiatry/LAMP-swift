@@ -419,6 +419,10 @@ fileprivate class URLEncoding: ParameterEncoding {
         if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false), !parameters.isEmpty {
             urlComponents.queryItems = APIHelper.mapValuesToQueryItems(parameters)
             urlRequest.url = urlComponents.url
+            
+            if let jsonData = parameters[JSONDataEncoding.explicitHttpBody] as? Data, !jsonData.isEmpty {
+                urlRequest.httpBody = jsonData//+20201220 to handle both parametr and body
+            }
         }
         
         return urlRequest

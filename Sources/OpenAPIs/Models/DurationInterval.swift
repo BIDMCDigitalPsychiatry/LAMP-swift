@@ -6,25 +6,25 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 public struct DurationInterval: Codable {
 
     /** The UNIX Epoch date-time representation: number of milliseconds since 1/1/1970 12:00 AM. */
     public var start: Double?
-    public var interval: [Any]?
+    public var interval: [AnyCodable]?
     public var repeatCount: Int64?
     /** The UNIX Epoch date-time representation: number of milliseconds since 1/1/1970 12:00 AM. */
     public var end: Double?
 
-    public init(start: Double? = nil, interval: [Any]? = nil, repeatCount: Int64? = nil, end: Double? = nil) {
+    public init(start: Double? = nil, interval: [AnyCodable]? = nil, repeatCount: Int64? = nil, end: Double? = nil) {
         self.start = start
         self.interval = interval
         self.repeatCount = repeatCount
         self.end = end
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable { 
+    public enum CodingKeys: String, CodingKey, CaseIterable {
         case start
         case interval
         case repeatCount = "repeat_count"

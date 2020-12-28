@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 /** The SensorSpec determines the parameters of generated SensorEvents. */
 public struct SensorSpec: Codable {
@@ -21,7 +21,7 @@ public struct SensorSpec: Codable {
         self.settingsSchema = settingsSchema
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable { 
+    public enum CodingKeys: String, CodingKey, CaseIterable {
         case name
         case settingsSchema = "settings_schema"
     }

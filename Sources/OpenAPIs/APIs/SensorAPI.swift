@@ -37,22 +37,22 @@ open class SensorAPI {
      - GET /sensor
      - Get the set of all sensors.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         let path = "/sensor"
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -60,7 +60,7 @@ open class SensorAPI {
     /**
      Get all sensors for a participant.
      
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -84,26 +84,26 @@ open class SensorAPI {
      - GET /participant/{participant_id}/sensor
      - Get the set of all sensors available to a participant, by participant  identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/participant/{participant_id}/sensor"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{participant_id}", with: participantIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -111,7 +111,7 @@ open class SensorAPI {
     /**
      Get all sensors for a researcher.
      
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -135,26 +135,26 @@ open class SensorAPI {
      - GET /researcher/{researcher_id}/sensor
      - Get the set of all sensors available to participants of any study conducted  by a researcher, by researcher identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorAllByResearcherWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorAllByResearcherWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/researcher/{researcher_id}/sensor"
         let researcherIdPreEscape = "\(APIHelper.mapValueToPathItem(researcherId))"
         let researcherIdPostEscape = researcherIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{researcher_id}", with: researcherIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -162,7 +162,7 @@ open class SensorAPI {
     /**
      View all sensors in a study.
      
-     - parameter studyId: (path)  
+     - parameter studyId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -186,26 +186,26 @@ open class SensorAPI {
      - GET /study/{study_id}/sensor
      - Get the set of all sensors available to participants of a single  study, by study identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter studyId: (path)  
+     - parameter studyId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorAllByStudyWithRequestBuilder(studyId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorAllByStudyWithRequestBuilder(studyId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/study/{study_id}/sensor"
         let studyIdPreEscape = "\(APIHelper.mapValueToPathItem(studyId))"
         let studyIdPostEscape = studyIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{study_id}", with: studyIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -213,8 +213,8 @@ open class SensorAPI {
     /**
      Create a new Sensor under the given Study.
      
-     - parameter studyId: (path)  
-     - parameter sensor: (body)  
+     - parameter studyId: (path)
+     - parameter sensor: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -237,11 +237,11 @@ open class SensorAPI {
      - POST /study/{study_id}/sensor
      - Create a new Sensor under the given Study.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter studyId: (path)  
-     - parameter sensor: (body)  
-     - returns: RequestBuilder<String> 
+     - parameter studyId: (path)
+     - parameter sensor: (body)
+     - returns: RequestBuilder<String>
      */
     open class func sensorCreateWithRequestBuilder(studyId: String, sensor: Sensor) -> RequestBuilder<String> {
         var path = "/study/{study_id}/sensor"
@@ -261,7 +261,7 @@ open class SensorAPI {
     /**
      Delete a Sensor.
      
-     - parameter sensorId: (path)  
+     - parameter sensorId: (path)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -284,10 +284,10 @@ open class SensorAPI {
      - DELETE /sensor/{sensor_id}
      - Delete a Sensor.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter sensorId: (path)  
-     - returns: RequestBuilder<String> 
+     - parameter sensorId: (path)
+     - returns: RequestBuilder<String>
      */
     open class func sensorDeleteWithRequestBuilder(sensorId: String) -> RequestBuilder<String> {
         var path = "/sensor/{sensor_id}"
@@ -307,8 +307,8 @@ open class SensorAPI {
     /**
      Update an Sensor's settings.
      
-     - parameter sensorId: (path)  
-     - parameter sensor: (body)  
+     - parameter sensorId: (path)
+     - parameter sensor: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -331,11 +331,11 @@ open class SensorAPI {
      - PUT /sensor/{sensor_id}
      - Update an Sensor's settings.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter sensorId: (path)  
-     - parameter sensor: (body)  
-     - returns: RequestBuilder<String> 
+     - parameter sensorId: (path)
+     - parameter sensor: (body)
+     - returns: RequestBuilder<String>
      */
     open class func sensorUpdateWithRequestBuilder(sensorId: String, sensor: Sensor) -> RequestBuilder<String> {
         var path = "/sensor/{sensor_id}"
@@ -355,7 +355,7 @@ open class SensorAPI {
     /**
      Get a single sensor, by identifier.
      
-     - parameter sensorId: (path)  
+     - parameter sensorId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -379,13 +379,13 @@ open class SensorAPI {
      - GET /sensor/{sensor_id}
      - Get a single sensor, by identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter sensorId: (path)  
+     - parameter sensorId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorViewWithRequestBuilder(sensorId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorViewWithRequestBuilder(sensorId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/sensor/{sensor_id}"
         let sensorIdPreEscape = "\(APIHelper.mapValueToPathItem(sensorId))"
         let sensorIdPostEscape = sensorIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -398,7 +398,7 @@ open class SensorAPI {
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

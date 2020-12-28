@@ -42,17 +42,17 @@ open class ActivitySpecAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]> 
      */
-    open class func activitySpecAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func activitySpecAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         let path = "/activity_spec"
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

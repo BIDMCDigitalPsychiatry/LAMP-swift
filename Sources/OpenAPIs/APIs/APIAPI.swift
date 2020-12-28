@@ -42,14 +42,14 @@ open class APIAPI {
      - parameter body: (body)  
      - returns: RequestBuilder<Any> 
      */
-    open class func aPIQueryWithRequestBuilder(body: String) -> RequestBuilder<Any> {
+    open class func aPIQueryWithRequestBuilder(body: String) -> RequestBuilder<AnyCodable> {
         let path = "/"
         let URLString = OpenAPIClientAPI.basePath + path
         let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: body)
 
         let url = URLComponents(string: URLString)
 
-        let requestBuilder: RequestBuilder<Any>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<AnyCodable>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
     }
@@ -61,8 +61,8 @@ open class APIAPI {
      - returns: AnyPublisher<Any, Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func aPISchema(apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<Any, Error> {
-        return Future<Any, Error>.init { promise in
+    open class func aPISchema(apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<AnyCodable, Error> {
+        return Future<AnyCodable, Error>.init { promise in
             aPISchemaWithRequestBuilder().execute(apiResponseQueue) { result -> Void in
                 switch result {
                 case let .success(response):
@@ -80,14 +80,14 @@ open class APIAPI {
      - View this API schema document from a live server instance.
      - returns: RequestBuilder<Any> 
      */
-    open class func aPISchemaWithRequestBuilder() -> RequestBuilder<Any> {
+    open class func aPISchemaWithRequestBuilder() -> RequestBuilder<AnyCodable> {
         let path = "/"
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         let url = URLComponents(string: URLString)
 
-        let requestBuilder: RequestBuilder<Any>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<AnyCodable>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

@@ -1,13 +1,6 @@
 #if !os(watchOS)
 import CallKit
 
-public class CallsData {
-    public var timestamp: Double = 0
-    public var type: Int = -1
-    public var duration: Int64 = 0
-    public var trace:String? = nil
-}
-
 public protocol CallsObserver: class {
     /**
      * Callback when a call event is recorded (received, made, missed)

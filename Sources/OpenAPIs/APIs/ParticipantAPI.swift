@@ -11,6 +11,9 @@ import Combine
 
 
 open class ParticipantAPI {
+    public struct Response: Decodable {
+        public let data: [Participant]
+    }
     /**
      Get the set of all participants.
      
@@ -37,22 +40,22 @@ open class ParticipantAPI {
      - GET /participant
      - Get the set of all participants.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func participantAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func participantAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         let path = "/participant"
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -60,7 +63,7 @@ open class ParticipantAPI {
     /**
      Get the set of all participants under a single researcher.
      
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -84,26 +87,26 @@ open class ParticipantAPI {
      - GET /researcher/{researcher_id}/participant
      - Get the set of all participants under a single researcher.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func participantAllByResearcherWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func participantAllByResearcherWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/researcher/{researcher_id}/participant"
         let researcherIdPreEscape = "\(APIHelper.mapValueToPathItem(researcherId))"
         let researcherIdPostEscape = researcherIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{researcher_id}", with: researcherIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -111,7 +114,7 @@ open class ParticipantAPI {
     /**
      Get the set of all participants in a single study.
      
-     - parameter studyId: (path)  
+     - parameter studyId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -135,26 +138,26 @@ open class ParticipantAPI {
      - GET /study/{study_id}/participant
      - Get the set of all participants in a single study.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter studyId: (path)  
+     - parameter studyId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func participantAllByStudyWithRequestBuilder(studyId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func participantAllByStudyWithRequestBuilder(studyId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/study/{study_id}/participant"
         let studyIdPreEscape = "\(APIHelper.mapValueToPathItem(studyId))"
         let studyIdPostEscape = studyIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{study_id}", with: studyIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -162,8 +165,8 @@ open class ParticipantAPI {
     /**
      Create a new Participant for the given Study.
      
-     - parameter studyId: (path)  
-     - parameter participant: (body)  
+     - parameter studyId: (path)
+     - parameter participant: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -186,11 +189,11 @@ open class ParticipantAPI {
      - POST /study/{study_id}/participant
      - Create a new Participant for the given Study.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter studyId: (path)  
-     - parameter participant: (body)  
-     - returns: RequestBuilder<String> 
+     - parameter studyId: (path)
+     - parameter participant: (body)
+     - returns: RequestBuilder<String>
      */
     open class func participantCreateWithRequestBuilder(studyId: String, participant: Participant) -> RequestBuilder<String> {
         var path = "/study/{study_id}/participant"
@@ -210,7 +213,7 @@ open class ParticipantAPI {
     /**
      Delete a participant AND all owned data or event streams.
      
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -233,10 +236,10 @@ open class ParticipantAPI {
      - DELETE /participant/{participant_id}
      - Delete a participant AND all owned data or event streams.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter participantId: (path)  
-     - returns: RequestBuilder<String> 
+     - parameter participantId: (path)
+     - returns: RequestBuilder<String>
      */
     open class func participantDeleteWithRequestBuilder(participantId: String) -> RequestBuilder<String> {
         var path = "/participant/{participant_id}"
@@ -256,8 +259,8 @@ open class ParticipantAPI {
     /**
      Update a Participant's settings.
      
-     - parameter participantId: (path)  
-     - parameter participant: (body)  
+     - parameter participantId: (path)
+     - parameter participant: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -280,11 +283,11 @@ open class ParticipantAPI {
      - PUT /participant/{participant_id}
      - Update a Participant's settings.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter participantId: (path)  
-     - parameter participant: (body)  
-     - returns: RequestBuilder<String> 
+     - parameter participantId: (path)
+     - parameter participant: (body)
+     - returns: RequestBuilder<String>
      */
     open class func participantUpdateWithRequestBuilder(participantId: String, participant: Participant) -> RequestBuilder<String> {
         var path = "/participant/{participant_id}"
@@ -304,14 +307,14 @@ open class ParticipantAPI {
     /**
      Get a single participant, by identifier.
      
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func participantView(participantId: String, transform: String? = nil, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<[Any], Error> {
-        return Future<[Any], Error>.init { promise in
+    open class func participantView(participantId: String, transform: String? = nil, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<ParticipantAPI.Response, Error> {
+        return Future<ParticipantAPI.Response, Error>.init { promise in
             participantViewWithRequestBuilder(participantId: participantId, transform: transform).execute(apiResponseQueue) { result -> Void in
                 switch result {
                 case let .success(response):
@@ -328,13 +331,13 @@ open class ParticipantAPI {
      - GET /participant/{participant_id}
      - Get a single participant, by identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func participantViewWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func participantViewWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<ParticipantAPI.Response> {
         var path = "/participant/{participant_id}"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -347,7 +350,7 @@ open class ParticipantAPI {
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<ParticipantAPI.Response>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

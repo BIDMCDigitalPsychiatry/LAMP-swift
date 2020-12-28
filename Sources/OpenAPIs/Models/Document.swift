@@ -6,14 +6,14 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 public struct Document: Codable {
 
     public var meta: Metadata?
-    public var data: [Any]?
+    public var data: [AnyCodable]?
 
-    public init(meta: Metadata? = nil, data: [Any]? = nil) {
+    public init(meta: Metadata? = nil, data: [AnyCodable]? = nil) {
         self.meta = meta
         self.data = data
     }

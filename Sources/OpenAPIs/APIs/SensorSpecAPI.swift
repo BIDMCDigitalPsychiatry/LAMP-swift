@@ -37,22 +37,22 @@ open class SensorSpecAPI {
      - GET /sensor_spec
      - Get all SensorSpecs registered by any Researcher.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorSpecAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorSpecAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         let path = "/sensor_spec"
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -60,7 +60,7 @@ open class SensorSpecAPI {
     /**
      Create a new SensorSpec.
      
-     - parameter sensorSpec: (body)  
+     - parameter sensorSpec: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -83,10 +83,10 @@ open class SensorSpecAPI {
      - POST /sensor_spec
      - Create a new SensorSpec.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter sensorSpec: (body)  
-     - returns: RequestBuilder<String> 
+     - parameter sensorSpec: (body)
+     - returns: RequestBuilder<String>
      */
     open class func sensorSpecCreateWithRequestBuilder(sensorSpec: SensorSpec) -> RequestBuilder<String> {
         let path = "/sensor_spec"
@@ -103,7 +103,7 @@ open class SensorSpecAPI {
     /**
      Delete an SensorSpec.
      
-     - parameter sensorSpecName: (path)  
+     - parameter sensorSpecName: (path)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -126,10 +126,10 @@ open class SensorSpecAPI {
      - DELETE /sensor_spec/{sensor_spec_name}
      - Delete an SensorSpec.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter sensorSpecName: (path)  
-     - returns: RequestBuilder<String> 
+     - parameter sensorSpecName: (path)
+     - returns: RequestBuilder<String>
      */
     open class func sensorSpecDeleteWithRequestBuilder(sensorSpecName: String) -> RequestBuilder<String> {
         var path = "/sensor_spec/{sensor_spec_name}"
@@ -149,8 +149,8 @@ open class SensorSpecAPI {
     /**
      Update an SensorSpec.
      
-     - parameter sensorSpecName: (path)  
-     - parameter sensorSpec: (body)  
+     - parameter sensorSpecName: (path)
+     - parameter sensorSpec: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -173,11 +173,11 @@ open class SensorSpecAPI {
      - PUT /sensor_spec/{sensor_spec_name}
      - Update an SensorSpec.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter sensorSpecName: (path)  
-     - parameter sensorSpec: (body)  
-     - returns: RequestBuilder<String> 
+     - parameter sensorSpecName: (path)
+     - parameter sensorSpec: (body)
+     - returns: RequestBuilder<String>
      */
     open class func sensorSpecUpdateWithRequestBuilder(sensorSpecName: String, sensorSpec: SensorSpec) -> RequestBuilder<String> {
         var path = "/sensor_spec/{sensor_spec_name}"
@@ -197,7 +197,7 @@ open class SensorSpecAPI {
     /**
      Get a SensorSpec.
      
-     - parameter sensorSpecName: (path)  
+     - parameter sensorSpecName: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -221,26 +221,26 @@ open class SensorSpecAPI {
      - GET /sensor_spec/{sensor_spec_name}
      - Get a SensorSpec.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter sensorSpecName: (path)  
+     - parameter sensorSpecName: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorSpecViewWithRequestBuilder(sensorSpecName: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorSpecViewWithRequestBuilder(sensorSpecName: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/sensor_spec/{sensor_spec_name}"
         let sensorSpecNamePreEscape = "\(APIHelper.mapValueToPathItem(sensorSpecName))"
         let sensorSpecNamePostEscape = sensorSpecNamePreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{sensor_spec_name}", with: sensorSpecNamePostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 /** A sensor that may or may not be available on a physical device. */
 public struct Sensor: Codable {

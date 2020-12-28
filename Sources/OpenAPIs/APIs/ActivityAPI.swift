@@ -42,17 +42,17 @@ open class ActivityAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]> 
      */
-    open class func activityAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func activityAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         let path = "/activity"
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -90,20 +90,20 @@ open class ActivityAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]> 
      */
-    open class func activityAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func activityAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/participant/{participant_id}/activity"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{participant_id}", with: participantIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -141,20 +141,20 @@ open class ActivityAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]> 
      */
-    open class func activityAllByResearcherWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func activityAllByResearcherWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/researcher/{researcher_id}/activity"
         let researcherIdPreEscape = "\(APIHelper.mapValueToPathItem(researcherId))"
         let researcherIdPostEscape = researcherIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{researcher_id}", with: researcherIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -192,20 +192,20 @@ open class ActivityAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]> 
      */
-    open class func activityAllByStudyWithRequestBuilder(studyId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func activityAllByStudyWithRequestBuilder(studyId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/study/{study_id}/activity"
         let studyIdPreEscape = "\(APIHelper.mapValueToPathItem(studyId))"
         let studyIdPostEscape = studyIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{study_id}", with: studyIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -385,20 +385,20 @@ open class ActivityAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]> 
      */
-    open class func activityViewWithRequestBuilder(activityId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func activityViewWithRequestBuilder(activityId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/activity/{activity_id}"
         let activityIdPreEscape = "\(APIHelper.mapValueToPathItem(activityId))"
         let activityIdPostEscape = activityIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{activity_id}", with: activityIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

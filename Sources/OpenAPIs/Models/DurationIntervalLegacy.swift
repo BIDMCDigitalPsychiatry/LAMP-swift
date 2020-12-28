@@ -6,22 +6,22 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 public struct DurationIntervalLegacy: Codable {
 
     public var repeatType: String?
     /** The UNIX Epoch date-time representation: number of milliseconds since 1/1/1970 12:00 AM. */
     public var date: Double?
-    public var customTimes: [Any]?
+    public var customTimes: [AnyCodable]?
 
-    public init(repeatType: String? = nil, date: Double? = nil, customTimes: [Any]? = nil) {
+    public init(repeatType: String? = nil, date: Double? = nil, customTimes: [AnyCodable]? = nil) {
         self.repeatType = repeatType
         self.date = date
         self.customTimes = customTimes
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable { 
+    public enum CodingKeys: String, CodingKey, CaseIterable {
         case repeatType = "repeat_type"
         case date
         case customTimes = "custom_times"

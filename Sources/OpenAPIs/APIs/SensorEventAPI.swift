@@ -8,13 +8,11 @@
 import Foundation
 import Combine
 
-
-
 open class SensorEventAPI {
     /**
      Get all sensor events for a participant.
      
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
@@ -41,32 +39,32 @@ open class SensorEventAPI {
      - GET /participant/{participant_id}/sensor_event
      - Get the set of all sensor events produced by the given participant.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorEventAllByParticipantWithRequestBuilder(participantId: String, origin: String? = nil, from: Double? = nil, to: Double? = nil, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorEventAllByParticipantWithRequestBuilder(participantId: String, origin: String? = nil, from: Double? = nil, to: Double? = nil, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/participant/{participant_id}/sensor_event"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{participant_id}", with: participantIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
-            "origin": origin?.encodeToJSON(), 
-            "from": from?.encodeToJSON(), 
-            "to": to?.encodeToJSON(), 
+            "origin": origin?.encodeToJSON(),
+            "from": from?.encodeToJSON(),
+            "to": to?.encodeToJSON(),
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -74,7 +72,7 @@ open class SensorEventAPI {
     /**
      Get all sensor events for a researcher by participant.
      
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
@@ -101,32 +99,32 @@ open class SensorEventAPI {
      - GET /researcher/{researcher_id}/sensor_event
      - Get the set of all sensor events produced by participants of any  study conducted by a researcher, by researcher identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorEventAllByResearcherWithRequestBuilder(researcherId: String, origin: String? = nil, from: Double? = nil, to: Double? = nil, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorEventAllByResearcherWithRequestBuilder(researcherId: String, origin: String? = nil, from: Double? = nil, to: Double? = nil, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/researcher/{researcher_id}/sensor_event"
         let researcherIdPreEscape = "\(APIHelper.mapValueToPathItem(researcherId))"
         let researcherIdPostEscape = researcherIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{researcher_id}", with: researcherIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
-            "origin": origin?.encodeToJSON(), 
-            "from": from?.encodeToJSON(), 
-            "to": to?.encodeToJSON(), 
+            "origin": origin?.encodeToJSON(),
+            "from": from?.encodeToJSON(),
+            "to": to?.encodeToJSON(),
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -134,7 +132,7 @@ open class SensorEventAPI {
     /**
      Get all sensor events for a study by participant.
      
-     - parameter studyId: (path)  
+     - parameter studyId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
@@ -161,32 +159,32 @@ open class SensorEventAPI {
      - GET /study/{study_id}/sensor_event
      - Get the set of all sensor events produced by participants of a  single study, by study identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter studyId: (path)  
+     - parameter studyId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func sensorEventAllByStudyWithRequestBuilder(studyId: String, origin: String? = nil, from: Double? = nil, to: Double? = nil, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func sensorEventAllByStudyWithRequestBuilder(studyId: String, origin: String? = nil, from: Double? = nil, to: Double? = nil, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/study/{study_id}/sensor_event"
         let studyIdPreEscape = "\(APIHelper.mapValueToPathItem(studyId))"
         let studyIdPostEscape = studyIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{study_id}", with: studyIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
-            "origin": origin?.encodeToJSON(), 
-            "from": from?.encodeToJSON(), 
-            "to": to?.encodeToJSON(), 
+            "origin": origin?.encodeToJSON(),
+            "from": from?.encodeToJSON(),
+            "to": to?.encodeToJSON(),
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -194,55 +192,84 @@ open class SensorEventAPI {
     /**
      Create a new SensorEvent for the given Participant.
      
-     - parameter participantId: (path)  
-     - parameter sensorEvent: (body)  
+     - parameter participantId: (path)
+     - parameter sensorEvent: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func sensorEventCreate(participantId: String, sensorEvent: SensorEvent, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<String, Error> {
-        return Future<String, Error>.init { promise in
+    open class func sensorEventCreate<T: Encodable>(participantId: String, sensorEvent: T, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<String, Error> {
+        return Future<String, Error>.init { promisse in
             sensorEventCreateWithRequestBuilder(participantId: participantId, sensorEvent: sensorEvent).execute(apiResponseQueue) { result -> Void in
                 switch result {
                 case let .success(response):
-                    promise(.success(response.body!))
+                    promisse(.success(response.body!))
                 case let .failure(error):
-                    promise(.failure(error))
+                    promisse(.failure(error))
                 }
             }
         }.eraseToAnyPublisher()
     }
-
+    
+    //This is for posting Push receipt
+    public static func pushReceiptEventCreate(participantId: String, sensorEvent: [String: Any], apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<String, Error> {
+        return Future<String, Error>.init { promisse in
+            sensorEventCreateWithRequestBuilder(participantId: participantId, sensorEvent: sensorEvent).execute(apiResponseQueue) { result -> Void in
+                switch result {
+                case let .success(response):
+                    promisse(.success(response.body!))
+                case let .failure(error):
+                    promisse(.failure(error))
+                }
+            }
+        }.eraseToAnyPublisher()
+    }
+    
     /**
      Create a new SensorEvent for the given Participant.
      - POST /participant/{participant_id}/sensor_event
      - Create a new SensorEvent for the given Participant.
      - API Key:
-       - type: apiKey Authorization 
-       - name: Authorization
-     - parameter participantId: (path)  
-     - parameter sensorEvent: (body)  
-     - returns: RequestBuilder<String> 
+     - type: apiKey Authorization
+     - name: Authorization
+     - parameter participantId: (path)
+     - parameter sensorEvent: (body)
+     - returns: RequestBuilder<String>
      */
-    open class func sensorEventCreateWithRequestBuilder(participantId: String, sensorEvent: SensorEvent) -> RequestBuilder<String> {
+    public static func sensorEventCreateWithRequestBuilder<T: Encodable>(participantId: String, sensorEvent: T) -> RequestBuilder<String> {
         var path = "/participant/{participant_id}/sensor_event"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{participant_id}", with: participantIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
         let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: sensorEvent)
-
+        print("URLString = \(URLString)")
         let url = URLComponents(string: URLString)
-
+        
         let requestBuilder: RequestBuilder<String>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
-
+        
         return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
     }
 
+    public static func sensorEventCreateWithRequestBuilder(participantId: String, sensorEvent: [String: Any]) -> RequestBuilder<String> {
+        var path = "/participant/{participant_id}/sensor_event"
+        let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
+        let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        path = path.replacingOccurrences(of: "{participant_id}", with: participantIdPostEscape, options: .literal, range: nil)
+        let URLString = OpenAPIClientAPI.basePath + path
+        let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: sensorEvent)
+        
+        let url = URLComponents(string: URLString)
+        
+        let requestBuilder: RequestBuilder<String>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        
+        return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
+    }
+    
     /**
      Delete a sensor event.
      
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
@@ -268,13 +295,13 @@ open class SensorEventAPI {
      - DELETE /participant/{participant_id}/sensor_event
      - Delete a sensor event.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter participantId: (path)  
+     - parameter participantId: (path)
      - parameter origin: (query)  (optional)
      - parameter from: (query)  (optional)
      - parameter to: (query)  (optional)
-     - returns: RequestBuilder<String> 
+     - returns: RequestBuilder<String>
      */
     open class func sensorEventDeleteWithRequestBuilder(participantId: String, origin: String? = nil, from: Double? = nil, to: Double? = nil) -> RequestBuilder<String> {
         var path = "/participant/{participant_id}/sensor_event"
@@ -286,8 +313,8 @@ open class SensorEventAPI {
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
-            "origin": origin?.encodeToJSON(), 
-            "from": from?.encodeToJSON(), 
+            "origin": origin?.encodeToJSON(),
+            "from": from?.encodeToJSON(),
             "to": to?.encodeToJSON()
         ])
 

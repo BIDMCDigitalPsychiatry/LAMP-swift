@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 public struct Researcher: Codable {
 
@@ -19,9 +19,9 @@ public struct Researcher: Codable {
     /** The physical address of the researcher. */
     public var address: String?
     /** The set of all studies conducted by the researcher. */
-    public var studies: [Any]?
+    public var studies: [AnyCodable]?
 
-    public init(id: String? = nil, name: String? = nil, email: String? = nil, address: String? = nil, studies: [Any]? = nil) {
+    public init(id: String? = nil, name: String? = nil, email: String? = nil, address: String? = nil, studies: [AnyCodable]? = nil) {
         self.id = id
         self.name = name
         self.email = email

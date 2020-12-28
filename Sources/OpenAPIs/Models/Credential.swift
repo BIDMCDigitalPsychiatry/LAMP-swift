@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AnyCodable
+//import AnyCodable
 
 /** Every object can have one or more credential(s) associated with it. (i.e. &#x60;my_researcher.credentials &#x3D; [&#39;person A&#39;, &#39;person B&#39;, &#39;api A&#39;&#39;, &#39;person C&#39;, &#39;api B&#39;]&#x60;) */
 public struct Credential: Codable {
@@ -27,7 +27,7 @@ public struct Credential: Codable {
         self.description = description
     }
 
-    public enum CodingKeys: String, CodingKey, CaseIterable { 
+    public enum CodingKeys: String, CodingKey, CaseIterable {
         case origin
         case accessKey = "access_key"
         case secretKey = "secret_key"

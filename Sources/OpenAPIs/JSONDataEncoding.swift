@@ -12,7 +12,7 @@ public struct JSONDataEncoding {
     // MARK: Properties
 
     private static let jsonDataKey = "jsonData"
-
+    public static let explicitHttpBody = "httpBody"//+202012
     // MARK: Encoding
 
     /// Creates a URL request by encoding parameters and applying them onto an existing request.

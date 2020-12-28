@@ -37,22 +37,22 @@ open class ResearcherAPI {
      - GET /researcher
      - Get the set of all researchers.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func researcherAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func researcherAllWithRequestBuilder(transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         let path = "/researcher"
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
@@ -60,7 +60,7 @@ open class ResearcherAPI {
     /**
      Create a new Researcher.
      
-     - parameter researcher: (body)  
+     - parameter researcher: (body)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -83,10 +83,10 @@ open class ResearcherAPI {
      - POST /researcher
      - Create a new Researcher.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter researcher: (body)  
-     - returns: RequestBuilder<String> 
+     - parameter researcher: (body)
+     - returns: RequestBuilder<String>
      */
     open class func researcherCreateWithRequestBuilder(researcher: Researcher) -> RequestBuilder<String> {
         let path = "/researcher"
@@ -103,7 +103,7 @@ open class ResearcherAPI {
     /**
      Delete a researcher.
      
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
      */
@@ -126,10 +126,10 @@ open class ResearcherAPI {
      - DELETE /researcher/{researcher_id}
      - Delete a researcher.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter researcherId: (path)  
-     - returns: RequestBuilder<String> 
+     - parameter researcherId: (path)
+     - returns: RequestBuilder<String>
      */
     open class func researcherDeleteWithRequestBuilder(researcherId: String) -> RequestBuilder<String> {
         var path = "/researcher/{researcher_id}"
@@ -149,8 +149,8 @@ open class ResearcherAPI {
     /**
      Update a Researcher's settings.
      
-     - parameter researcherId: (path)  
-     - parameter researcher: (body)  
+     - parameter researcherId: (path)
+     - parameter researcher: (body)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<String, Error>
@@ -174,12 +174,12 @@ open class ResearcherAPI {
      - PUT /researcher/{researcher_id}
      - Update a Researcher's settings.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter researcherId: (path)  
-     - parameter researcher: (body)  
+     - parameter researcherId: (path)
+     - parameter researcher: (body)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<String> 
+     - returns: RequestBuilder<String>
      */
     open class func researcherUpdateWithRequestBuilder(researcherId: String, researcher: Researcher, transform: String? = nil) -> RequestBuilder<String> {
         var path = "/researcher/{researcher_id}"
@@ -202,7 +202,7 @@ open class ResearcherAPI {
     /**
      Get a single researcher, by identifier.
      
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter transform: (query)  (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - returns: AnyPublisher<[Any], Error>
@@ -226,26 +226,26 @@ open class ResearcherAPI {
      - GET /researcher/{researcher_id}
      - Get a single researcher, by identifier.
      - API Key:
-       - type: apiKey Authorization 
+       - type: apiKey Authorization
        - name: Authorization
-     - parameter researcherId: (path)  
+     - parameter researcherId: (path)
      - parameter transform: (query)  (optional)
-     - returns: RequestBuilder<[Any]> 
+     - returns: RequestBuilder<[Any]>
      */
-    open class func researcherViewWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[Any]> {
+    open class func researcherViewWithRequestBuilder(researcherId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
         var path = "/researcher/{researcher_id}"
         let researcherIdPreEscape = "\(APIHelper.mapValueToPathItem(researcherId))"
         let researcherIdPostEscape = researcherIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         path = path.replacingOccurrences(of: "{researcher_id}", with: researcherIdPostEscape, options: .literal, range: nil)
         let URLString = OpenAPIClientAPI.basePath + path
-        let parameters: [String:Any]? = nil
+        let parameters: [String:AnyCodable]? = nil
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[Any]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

@@ -7,6 +7,8 @@
 import Foundation
 
 open class OpenAPIClientAPI {
+
+    public static let logsBasePath = "https://logs.lamp.digital"//+202012
     public static var basePath = "https://api-staging.lamp.digital"
     public static var credential: URLCredential?
     public static var customHeaders: [String:String] = [:]
