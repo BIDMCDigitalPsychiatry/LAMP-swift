@@ -289,7 +289,6 @@ extension LMHealthKitSensor {
             
         } catch let error {
             print("error = \(error.localizedDescription)")
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.hk_characteristicType_fetch_error + error.localizedDescription)
         }
         do {
             let biologicalSex =       try healthStore.biologicalSex()
@@ -301,7 +300,6 @@ extension LMHealthKitSensor {
             arrData.append(data)
         } catch let error {
             print("error = \(error.localizedDescription)")
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.hk_characteristicType_fetch_error + error.localizedDescription)
         }
         
         do {
@@ -314,7 +312,6 @@ extension LMHealthKitSensor {
             arrData.append(data)
         } catch let error {
             print("error = \(error.localizedDescription)")
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.hk_characteristicType_fetch_error + error.localizedDescription)
         }
         
         do {
@@ -327,7 +324,6 @@ extension LMHealthKitSensor {
             arrData.append(data)
         } catch let error {
             print("error = \(error.localizedDescription)")
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.hk_characteristicType_fetch_error + error.localizedDescription)
         }
         do {
             let skinType =            try healthStore.fitzpatrickSkinType()
@@ -339,7 +335,6 @@ extension LMHealthKitSensor {
             arrData.append(data)
         } catch let error {
             print("error = \(error.localizedDescription)")
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.hk_characteristicType_fetch_error + error.localizedDescription)
         }
         arrCharacteristicData.append(contentsOf: arrData)
     }
@@ -481,7 +476,6 @@ extension LMHealthKitSensor {
                 queryGroup.leave()
             }
             if nil != errorUnit {
-                //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.hk_data_fetch_uniterror + err.localizedDescription)
                 continue
             }
             

@@ -1,89 +1,14 @@
 import CoreLocation
 
-public class GeofenceData: LampSensorCoreObject {
-    
-    public static let TABLE_NAME = "geofenceData"
-    
-    public var horizontalAccuracy: Double = 0
-    public var verticalAccuracy: Double   = 0
-    public var latitude:Double            = 0
-    public var longitude:Double           = 0
-
-    public var onExit:Bool  = false
-    public var onEntry:Bool = false
-
-    public var targetLatitude:Double  = 0
-    public var targetLongitude:Double = 0
-    public var targetRadius:Double    = 0
-    public var identifier:String      = ""
-
-    
-    public override func toDictionary() -> Dictionary<String, Any> {
-        var dict = super.toDictionary()
-        dict["horizontalAccuracy"] = horizontalAccuracy
-        dict["verticalAccuracy"]   = verticalAccuracy
-        dict["latitude"]           = latitude
-        dict["longitude"]          = longitude
-        
-        dict["onExit"]  = onExit
-        dict["onEntry"] = onEntry
-
-        dict["identifier"]         = identifier
-        return dict
-    }
-}
-
-public class HeadingData: LampSensorCoreObject {
-    
-    public static var TABLE_NAME = "headingData"
-
-    public var magneticHeading: Double = 0
-    public var trueHeading: Double = 0
-    public var headingAccuracy: Double = 0
-    public var x: Double = 0
-    public var y: Double = 0
-    public var z: Double = 0
-
-    override public func toDictionary() -> Dictionary<String, Any> {
-        var dict = super.toDictionary()
-        dict["headingAccuracy"] = headingAccuracy
-        dict["trueHeading"] = trueHeading
-        dict["magneticHeading"] = magneticHeading
-        dict["x"] = x
-        dict["y"] = y
-        dict["z"] = z
-        return dict
-    }
-
-}
-
-public class VisitData: LampSensorCoreObject {
-    
-    public static let TABLE_NAME = "visitData"
-    
-    public var horizontalAccuracy: Double = 0
-    public var latitude:Double = 0
-    public var longitude:Double = 0
-    public var name:String = ""
-    public var address:String = ""
-    public var departure:Int64 = 0
-    public var arrival:Int64 = 0
-    
-    public override func toDictionary() -> Dictionary<String, Any> {
-        var dict = super.toDictionary()
-        dict["horizontalAccuracy"] = horizontalAccuracy
-        dict["latitude"] = latitude
-        dict["longitude"] = longitude
-        dict["name"] = name
-        dict["address"] = address
-        dict["departure"] = departure
-        dict["arrival"] = arrival
-        return dict
-    }
-}
-
 public protocol LocationsObserver: class {
     func onLocationChanged(data: LocationsData)
+    func onError(_ errType: LocationErrorType)
+}
+
+public enum LocationErrorType {
+    case notEnabled
+    case denied
+    case otherErrors(Error)
 }
 
 
@@ -133,32 +58,29 @@ public class LocationsSensor: NSObject, ISensorController {
     
     public func start() {
         
+        // Do not start services that aren't available.
+        if false == CLLocationManager.locationServicesEnabled() {
+            // Location services is not available.
+            CONFIG.sensorObserver?.onError(LocationErrorType.notEnabled)
+            return
+        }
+        
         switch CLLocationManager.authorizationStatus() {
         case .notDetermined:
             // Request when-in-use authorization initially
             locationManager.requestAlwaysAuthorization()
             return
         case .restricted, .denied:
-            // Disable location features
-            // disableMyLocationBasedFeatures()
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.gps_off)
+            CONFIG.sensorObserver?.onError(LocationErrorType.denied)
             return
-        case .authorizedWhenInUse, .authorizedAlways:
+        case .authorizedWhenInUse:
             locationManager.requestAlwaysAuthorization()
-            // Enable basic location features
-            // enableMyWhenInUseFeatures()
+        case .authorizedAlways:
             break
         @unknown default:
             break
         }
-        
-        // Do not start services that aren't available.
-        if false == CLLocationManager.locationServicesEnabled() {
-            // Location services is not available.
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.gps_off)
-            return
-        }
-        
+
         self.startLocationServices()
 
     }
@@ -211,7 +133,7 @@ extension LocationsSensor: CLLocationManagerDelegate {
             self.start()
             break
         case .restricted, .denied:
-            //LMLogsManager.shared.addLogs(level: .warning, logs: Logs.Messages.gps_off)
+            CONFIG.sensorObserver?.onError(LocationErrorType.denied)
             break
         default:
             break
@@ -243,7 +165,7 @@ extension LocationsSensor: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         //let msg = String(format: Logs.Messages.location_error, error.localizedDescription)
-        //LMLogsManager.shared.addLogs(level: .warning, logs: msg)
+        CONFIG.sensorObserver?.onError(LocationErrorType.otherErrors(error))
         if self.CONFIG.debug { print(error) }
     }
     
