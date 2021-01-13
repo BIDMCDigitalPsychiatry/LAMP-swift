@@ -10,6 +10,20 @@ public enum LogsLevel: String {
     case warning
     case error
     case fatal
+    
+    public var levelValue: Int {
+        switch self {
+            
+        case .info:
+            return 1
+        case .warning:
+            return 2
+        case .error:
+            return 3
+        case .fatal:
+            return 4
+        }
+    }
 }
 
 extension LogsLevel: Codable {
@@ -85,7 +99,7 @@ public struct LogsAPI {
         
         let requestBuilder: RequestBuilder<String>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
         
-        return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
+        return requestBuilder.init(method: "PUT", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }
 }
 
