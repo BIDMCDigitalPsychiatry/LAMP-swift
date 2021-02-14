@@ -73,7 +73,7 @@ public class LMHealthKitWorkoutData: LampSensorCoreObject {
     public var endDate: Double?
     public var metadata: [String: Any]?
     public var type: String = ""  // eg: HKQuantityTypeIdentifier
-    public var value: Double?  // e.g., 60
+    public var duration: Double?  // e.g., 60
     public var valueText: String?  // e.g., 60
     public var unit: String? // e.g., count/min
 
@@ -90,7 +90,7 @@ public protocol LMHealthKitSensorObserver: class {
 public class LMHealthKitSensor: ISensorController {
     
     // MARK: - VARIABLES
-    
+    var sensorsToCollect: [String]?
     public weak var observer: LMHealthKitSensorObserver?
     public var healthStore : HKHealthStore
     //public var fetchLimit = 100
@@ -104,8 +104,10 @@ public class LMHealthKitSensor: ISensorController {
     //HKWorkoutData
     private var arrWorkoutData = [LMHealthKitWorkoutData]()
     
-    public init() {
+    public init(_ sensorsToCollect: [String]? = nil) {
+        self.sensorsToCollect = sensorsToCollect
         healthStore = HKHealthStore()
+        print("sensorsToCollect = \(sensorsToCollect)")
         //super.init()
     }
     
@@ -114,24 +116,45 @@ public class LMHealthKitSensor: ISensorController {
     }
     
     public func stop() {}
+    var nutritionTypes: [HKQuantityTypeIdentifier] = [.dietaryFatTotal, .dietaryFatPolyunsaturated, .dietaryFatMonounsaturated, .dietaryFatSaturated, .dietaryCholesterol, .dietarySodium, .dietaryCarbohydrates, .dietaryFiber, .dietarySugar, .dietaryEnergyConsumed, .dietaryProtein, .dietaryVitaminA, .dietaryVitaminB6, .dietaryVitaminB12, .dietaryVitaminC, .dietaryVitaminD, .dietaryVitaminE, .dietaryVitaminK, .dietaryCalcium, .dietaryIron, .dietaryThiamin, .dietaryRiboflavin, .dietaryNiacin, .dietaryFolate, .dietaryBiotin, .dietaryPantothenicAcid, .dietaryPhosphorus, .dietaryIodine, .dietaryMagnesium, .dietaryZinc, .dietarySelenium, .dietaryCopper, .dietaryManganese, .dietaryChromium, .dietaryMolybdenum, .dietaryChloride, .dietaryPotassium, .dietaryCaffeine, .dietaryWater]
     //when ever add new data type, then handle the same in fetchHealthKitQuantityData(), extension HKQuantityTypeIdentifier: LampDataKeysProtocol
     public lazy var healthQuantityTypes: [HKSampleType] = {
         
         var quantityTypes = [HKSampleType]()
-        var identifiers: [HKQuantityTypeIdentifier] = [.heartRate, .bodyMass, .height, .bloodPressureDiastolic, .bloodPressureSystolic, .respiratoryRate, .bodyMassIndex, .bodyFatPercentage, .leanBodyMass, .waistCircumference]
-        identifiers.append(contentsOf: [.stepCount, .distanceWalkingRunning, .distanceCycling, .distanceWheelchair, .basalEnergyBurned, .activeEnergyBurned, .flightsClimbed, .nikeFuel, .appleExerciseTime, .pushCount, .distanceSwimming, .swimmingStrokeCount, .vo2Max, .distanceDownhillSnowSports])
-        identifiers.append(contentsOf: [.bodyTemperature, .basalBodyTemperature, .restingHeartRate, .walkingHeartRateAverage, .heartRateVariabilitySDNN, .oxygenSaturation, .peripheralPerfusionIndex, .bloodGlucose, .numberOfTimesFallen, .electrodermalActivity, .inhalerUsage, .insulinDelivery, .bloodAlcoholContent, .forcedVitalCapacity, .forcedExpiratoryVolume1, .peakExpiratoryFlowRate])
-        identifiers.append(contentsOf: [.dietaryFatTotal, .dietaryFatPolyunsaturated, .dietaryFatMonounsaturated, .dietaryFatSaturated, .dietaryCholesterol, .dietarySodium, .dietaryCarbohydrates, .dietaryFiber, .dietarySugar, .dietaryEnergyConsumed, .dietaryProtein, .dietaryVitaminA, .dietaryVitaminB6, .dietaryVitaminB12, .dietaryVitaminC, .dietaryVitaminD, .dietaryVitaminE, .dietaryVitaminK, .dietaryCalcium, .dietaryIron, .dietaryThiamin, .dietaryRiboflavin, .dietaryNiacin, .dietaryFolate, .dietaryBiotin, .dietaryPantothenicAcid, .dietaryPhosphorus, .dietaryIodine, .dietaryMagnesium, .dietaryZinc, .dietarySelenium, .dietaryCopper, .dietaryManganese, .dietaryChromium, .dietaryMolybdenum, .dietaryChloride, .dietaryPotassium, .dietaryCaffeine, .dietaryWater, .uvExposure])
-        if #available(iOS 13.0, *) {
-            identifiers.append(.appleStandTime)
-            identifiers.append(.environmentalAudioExposure)
-            identifiers.append(.headphoneAudioExposure)
-            
-        } else {
-            // Fallback on earlier versions
+        var identifiers: [HKQuantityTypeIdentifier] = []// [.heartRate, .bloodPressureDiastolic, .bloodPressureSystolic, .respiratoryRate]
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.heartRate.lampIdentifier) == true {
+            identifiers.append(.heartRate)
         }
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.bloodPressureDiastolic.lampIdentifier) == true {
+            identifiers.append(.bloodPressureDiastolic)
+            identifiers.append(.bloodPressureSystolic)
+        }
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier) == true {
+            identifiers.append(.respiratoryRate)
+        }
+        //var identifiers: [HKQuantityTypeIdentifier] = [.heartRate, .bodyMass, .height, .bloodPressureDiastolic, .bloodPressureSystolic, .respiratoryRate, .bodyMassIndex, .bodyFatPercentage, .leanBodyMass, .waistCircumference]
+        //identifiers.append(contentsOf: [.stepCount, .distanceWalkingRunning, .distanceCycling, .distanceWheelchair, .basalEnergyBurned, .activeEnergyBurned, .flightsClimbed, .nikeFuel, .appleExerciseTime, .pushCount, .distanceSwimming, .swimmingStrokeCount, .vo2Max, .distanceDownhillSnowSports])
+        //identifiers.append(contentsOf: [.bodyTemperature, .oxygenSaturation, .bloodGlucose])
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.bodyTemperature.lampIdentifier) == true {
+            identifiers.append(.bodyTemperature)
+        }
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.oxygenSaturation.lampIdentifier) == true {
+            identifiers.append(.oxygenSaturation)
+        }
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.bloodGlucose.lampIdentifier) == true {
+            identifiers.append(.bloodGlucose)
+        }
+        //identifiers.append(contentsOf: [.bodyTemperature, .basalBodyTemperature, .restingHeartRate, .walkingHeartRateAverage, .heartRateVariabilitySDNN, .oxygenSaturation, .peripheralPerfusionIndex, .bloodGlucose, .numberOfTimesFallen, .electrodermalActivity, .inhalerUsage, .insulinDelivery, .bloodAlcoholContent, .forcedVitalCapacity, .forcedExpiratoryVolume1, .peakExpiratoryFlowRate])
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.dietaryIron.lampIdentifier) == true {
+            identifiers.append(contentsOf: nutritionTypes)//, .uvExposure])
+        }
+
+//        identifiers.append(.appleStandTime)
+//        identifiers.append(.environmentalAudioExposure)
+//        identifiers.append(.headphoneAudioExposure)
+
         for identifier in identifiers {
-            if let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) {
+            if let quantityType =   HKQuantityType.quantityType(forIdentifier: identifier) {
                 quantityTypes.append(quantityType)
             }
         }
@@ -140,27 +163,31 @@ public class LMHealthKitSensor: ISensorController {
     
     public lazy var healthCategoryTypes: [HKSampleType] = {
         var arrTypes = [HKSampleType]()
-        var identifiers: [HKCategoryTypeIdentifier] = [.sleepAnalysis, .appleStandHour, .cervicalMucusQuality, .ovulationTestResult, .menstrualFlow, .intermenstrualBleeding, .sexualActivity, .mindfulSession]
-        if #available(iOS 13.0, *) {
-            identifiers.append(contentsOf: [.highHeartRateEvent, .lowHeartRateEvent, .irregularHeartRhythmEvent, .audioExposureEvent, .toothbrushingEvent])
+        #if os(iOS)
+        var identifiers: [HKCategoryTypeIdentifier] = []//[.sleepAnalysis]
+        if sensorsToCollect?.contains(HKCategoryTypeIdentifier.sleepAnalysis.lampIdentifier) == true {
+            identifiers.append(.sleepAnalysis)
         }
+        //var identifiers: [HKCategoryTypeIdentifier] = [.sleepAnalysis, .appleStandHour, .cervicalMucusQuality, .ovulationTestResult, .menstrualFlow, .intermenstrualBleeding, .sexualActivity, .mindfulSession]
+        //identifiers.append(contentsOf: [.highHeartRateEvent, .lowHeartRateEvent, .irregularHeartRhythmEvent, .audioExposureEvent, .toothbrushingEvent])
         for identifier in identifiers {
             if let quantityType = HKCategoryType.categoryType(forIdentifier: identifier) {
                 arrTypes.append(quantityType)
             }
         }
+        #endif
         return arrTypes
     }()
     
     lazy var healthCharacteristicTypes: [HKObjectType] = {
-        var characteristicTypes = [HKObjectType]()
-        var identifiers: [HKCharacteristicTypeIdentifier] = [HKCharacteristicTypeIdentifier.biologicalSex, HKCharacteristicTypeIdentifier.bloodType, HKCharacteristicTypeIdentifier.dateOfBirth, HKCharacteristicTypeIdentifier.fitzpatrickSkinType, HKCharacteristicTypeIdentifier.wheelchairUse]
-        for identifier in identifiers {
-            if let coreRelationType = HKCorrelationType.characteristicType(forIdentifier: identifier) {
-                characteristicTypes.append(coreRelationType)
-            }
-        }
-        return characteristicTypes
+//        var characteristicTypes = [HKObjectType]()
+//        var identifiers: [HKCharacteristicTypeIdentifier] = [HKCharacteristicTypeIdentifier.biologicalSex, HKCharacteristicTypeIdentifier.bloodType, HKCharacteristicTypeIdentifier.dateOfBirth, HKCharacteristicTypeIdentifier.fitzpatrickSkinType, HKCharacteristicTypeIdentifier.wheelchairUse]
+//        for identifier in identifiers {
+//            if let coreRelationType = HKCorrelationType.characteristicType(forIdentifier: identifier) {
+//                characteristicTypes.append(coreRelationType)
+//            }
+//        }
+        return []
     }()
     
     public func clearDataArrays() {
@@ -189,6 +216,7 @@ private extension LMHealthKitSensor {
         }
         
         let dataTypes = Set(lampHealthKitTypes())
+        print("dataTypes = \(dataTypes)")
         healthStore.requestAuthorization(toShare: nil, read: dataTypes) { [weak self] (success, error) -> Void in
             if let observer = self?.observer {
                 observer.onHKAuthorizationStatusChanged(success: success, error: error)
@@ -202,9 +230,11 @@ private extension LMHealthKitSensor {
         arrSampleTypes.append(contentsOf: healthQuantityTypes)
         arrSampleTypes.append(contentsOf: healthCategoryTypes)
         arrSampleTypes.append(contentsOf: healthCharacteristicTypes)
-        let workout = HKWorkoutType.workoutType()
-        arrSampleTypes.append(workout)
-        
+        if sensorsToCollect?.contains(SensorType.lamp_segment.lampIdentifier) == true {
+            let workout = HKWorkoutType.workoutType()
+            arrSampleTypes.append(workout)
+        }
+        print("arrSampleTypes count = \(arrSampleTypes.count)")
         return arrSampleTypes
     }
     
@@ -569,7 +599,7 @@ extension LMHealthKitSensor {
                 data.device = json
             }
             data.type = sample.workoutActivityType.stringType
-            data.value = sample.duration
+            data.duration = sample.duration
             data.startDate = sample.startDate.timeIntervalSince1970 * 1000
             data.endDate   = sample.endDate.timeIntervalSince1970 * 1000
             if let meta = sample.metadata {

@@ -1,8 +1,11 @@
 import CoreLocation
 
 public protocol LocationsObserver: class {
-    func onLocationChanged(data: LocationsData)
     func onError(_ errType: LocationErrorType)
+}
+
+public protocol LocationsDataObserver: class {
+    func onLocationChanged(data: LocationsData)
 }
 
 public enum LocationErrorType {
@@ -23,6 +26,7 @@ public class LocationsSensor: NSObject, ISensorController {
     public class Config:SensorConfig {
         
         public weak var sensorObserver: LocationsObserver?
+        public weak var locationDataObserver: LocationsDataObserver?
         //public var geoFences: String? = nil; // TODO: convert the value to CLRegion
         public var statusGps = true
         public var minimumInterval = 0.0//in seconds
@@ -142,7 +146,7 @@ extension LocationsSensor: CLLocationManagerDelegate {
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        guard let observer = CONFIG.sensorObserver else { return }
+        guard let dataObserver = CONFIG.locationDataObserver else { return }
         let sortedLocations = locations.sorted { (l1, l2) -> Bool in
             return l1.timestamp.compare(l2.timestamp) != .orderedDescending
         }
@@ -156,7 +160,7 @@ extension LocationsSensor: CLLocationManagerDelegate {
                 let locationStamp = newestLocation.timestamp.timeIntervalSince1970
                 if (locationStamp - lastStoredTime) > CONFIG.minimumInterval {
                     //self.saveLocations(newestLocation, eventTime: newestLocation.timestamp)
-                    observer.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
+                    dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
                     lastStoredTime = locationStamp
                 }
             }

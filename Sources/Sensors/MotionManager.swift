@@ -49,11 +49,11 @@ public class MotionManager: ISensorController {
         public var threshold: Double = 0
         //public var sensorTimerDataStoreInterval: Double = 10.0 * 60.0
         
-        public weak var accelerometerObserver: AccelerometerObserver?
-        public weak var gyroObserver: GyroscopeObserver?
+        public weak var accelerometerObserver: AccelerometerObserver? = nil
+        public weak var gyroObserver: GyroscopeObserver? = nil
         public weak var magnetoObserver: MagnetometerObserver? = nil
-        public weak var motionObserver: MotionObserver?
-        public weak var sensorTimerDelegate: SensorStore?
+        public weak var motionObserver: MotionObserver? = nil
+        //public weak var sensorTimerDelegate: SensorStore? = nil
         
         public override init() {
             super.init()
@@ -178,6 +178,18 @@ public class MotionManager: ISensorController {
     
     private func startUpdates() {
         if CONFIG.accelerometerObserver != nil {
+            if CONFIG.motionObserver != nil {
+                self.motionManager.startAccelerometerUpdates()
+            } else {
+                self.motionManager.startAccelerometerUpdates(to: opQueue) { (accelData, error) in
+                    if let dataAcc = accelData {
+                        self.CONFIG.accelerometerObserver?.onDataChanged(data: AccelerometerData(dataAcc.acceleration))
+                    }
+                }
+            }
+        }
+        
+        if CONFIG.accelerometerObserver != nil && CONFIG.motionObserver != nil {
             self.motionManager.startAccelerometerUpdates()
         }
         if CONFIG.gyroObserver != nil {
@@ -186,30 +198,25 @@ public class MotionManager: ISensorController {
         if CONFIG.magnetoObserver != nil {
             self.motionManager.startMagnetometerUpdates()
         }
-//        if CONFIG.motionObserver != nil {
-//            self.motionManager.startDeviceMotionUpdates()
-//        }
-        self.motionManager.startDeviceMotionUpdates(to: opQueue) { (deviceMotion, error) in
+        
+        if CONFIG.motionObserver != nil {
+            self.motionManager.startDeviceMotionUpdates(using: CMAttitudeReferenceFrame.xArbitraryCorrectedZVertical, to: opQueue) { (deviceMotion, error) in
 
-            if let dataAcc = self.motionManager.accelerometerData {
-                self.CONFIG.accelerometerObserver?.onDataChanged(data: AccelerometerData(dataAcc.acceleration))
+                if let dataAcc = self.motionManager.accelerometerData {
+                    self.CONFIG.accelerometerObserver?.onDataChanged(data: AccelerometerData(dataAcc.acceleration))
+                }
+                if let dataMag = self.motionManager.magnetometerData {
+                    self.CONFIG.magnetoObserver?.onDataChanged(data: MagnetometerData(dataMag.magneticField))
+                }
+                if let dataGyro = self.motionManager.gyroData {
+                    self.CONFIG.gyroObserver?.onDataChanged(data: GyroscopeData(dataGyro.rotationRate))
+                }
+                if let dataMotion = deviceMotion {
+                    self.CONFIG.motionObserver?.onDataChanged(data: MotionData(dataMotion))
+                }
             }
-            if let dataMag = self.motionManager.magnetometerData {
-                self.CONFIG.magnetoObserver?.onDataChanged(data: MagnetometerData(dataMag.magneticField))
-            }
-            if let dataGyro = self.motionManager.gyroData {
-                self.CONFIG.gyroObserver?.onDataChanged(data: GyroscopeData(dataGyro.rotationRate))
-            }
-            if let dataMotion = deviceMotion {
-                self.CONFIG.motionObserver?.onDataChanged(data: MotionData(dataMotion))
-            }
-
-//            if self.runCount > Double(self.CONFIG.frequency) * self.CONFIG.sensorTimerDataStoreInterval {
-//                self.runCount = 0
-//                self.CONFIG.sensorTimerDelegate?.timeToStore()
-//            }
-//            self.runCount += 1
         }
+        
     }
 }
 #endif

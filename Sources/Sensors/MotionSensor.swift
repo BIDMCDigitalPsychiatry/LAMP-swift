@@ -17,7 +17,7 @@ public class MotionData {
     
     public var acceleration: CMAcceleration
     public var rotationRate: CMRotationRate
-    //public var magneticField: CMMagneticField
+    public var magneticField: CMMagneticField
     public var gravity: CMAcceleration
     public var deviceAttitude: DeviceAttitude
     
@@ -26,7 +26,7 @@ public class MotionData {
         timestamp = Date().timeIntervalSince1970 * 1000
         self.acceleration = deviceMotion.userAcceleration
         self.rotationRate = deviceMotion.rotationRate
-        //self.magneticField = deviceMotion.magneticField.field//we can check accuracy here
+        self.magneticField = deviceMotion.magneticField.field//we can check accuracy here
         self.gravity = deviceMotion.gravity
         self.deviceAttitude = DeviceAttitude(roll: deviceMotion.attitude.roll, pitch: deviceMotion.attitude.pitch, yaw: deviceMotion.attitude.yaw)
     }

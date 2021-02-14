@@ -11,6 +11,9 @@ import Combine
 
 
 open class SensorAPI {
+    public struct Response: Decodable {
+        public let data: [Sensor]
+    }
     /**
      Get the set of all sensors.
      
@@ -66,8 +69,8 @@ open class SensorAPI {
      - returns: AnyPublisher<[Any], Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func sensorAllByParticipant(participantId: String, transform: String? = nil, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<[Any], Error> {
-        return Future<[Any], Error>.init { promise in
+    open class func sensorAllByParticipant(participantId: String, transform: String? = nil, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<SensorAPI.Response, Error> {
+        return Future<SensorAPI.Response, Error>.init { promise in
             sensorAllByParticipantWithRequestBuilder(participantId: participantId, transform: transform).execute(apiResponseQueue) { result -> Void in
                 switch result {
                 case let .success(response):
@@ -90,7 +93,7 @@ open class SensorAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]>
      */
-    open class func sensorAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
+    open class func sensorAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<SensorAPI.Response> {
         var path = "/participant/{participant_id}/sensor"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -103,7 +106,7 @@ open class SensorAPI {
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<SensorAPI.Response>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

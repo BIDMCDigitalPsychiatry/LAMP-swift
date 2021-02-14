@@ -3,10 +3,15 @@ import CoreMotion
 public class MagnetometerData {
     
     public var timestamp: Double
-    public var magnetoData: CMMagneticField
+    public var caliberatedMagneticData: CMCalibratedMagneticField?
+    public var magneticData: CMMagneticField?
     
-    init(_ magnetoData: CMMagneticField) {
-        self.magnetoData = magnetoData
+    init(_ caliberatedMagnetoData: CMCalibratedMagneticField) {
+        self.caliberatedMagneticData = caliberatedMagnetoData
+        timestamp = Date().timeIntervalSince1970 * 1000
+    }
+    init(_ magneticData: CMMagneticField) {
+        self.magneticData = magneticData
         timestamp = Date().timeIntervalSince1970 * 1000
     }
 }

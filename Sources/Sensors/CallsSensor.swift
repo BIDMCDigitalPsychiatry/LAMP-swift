@@ -42,6 +42,26 @@ public class CallsSensor: NSObject, ISensorController {
         case rejected  = 5
         case blocked   = 6
         case answeredExternally = 7
+        
+        var stringValue: String {
+            switch self {
+            
+            case .incoming:
+                return "incoming"
+            case .outgoing:
+                return "outgoing"
+            case .missed:
+                return "missed"
+            case .voiceMail:
+                return "voicemail"
+            case .rejected:
+                return "rejected"
+            case .blocked:
+                return "blocked"
+            case .answeredExternally:
+                return "external"
+            }
+        }
     }
     
     public var CONFIG = Config()
@@ -50,7 +70,7 @@ public class CallsSensor: NSObject, ISensorController {
     
     var lastCallEvent:CXCall? = nil
     var lastCallEventTime:Date? = nil
-    var lastCallEventType:Int? = nil
+    var lastCallEventType: CallEventType? = nil
     
     public class Config:SensorConfig {
         public weak var sensorObserver: CallsObserver?
@@ -105,8 +125,8 @@ extension CallsSensor: CXCallObserverDelegate {
      */
     public func callObserver(_ callObserver: CXCallObserver, callChanged call: CXCall) {
         print(call.isOutgoing, call.isOnHold, call.hasEnded, call.hasConnected)
-        if call.hasEnded   == true && call.isOutgoing == false || // in-coming end
-           call.hasEnded   == true && call.isOutgoing == true {   // out-going end
+        if call.hasEnded == true && call.isOutgoing == false || // in-coming end
+           call.hasEnded == true && call.isOutgoing == true {   // out-going end
             if self.CONFIG.debug { print("Disconnected") }
             if let observer = self.CONFIG.sensorObserver{
                 observer.onFree(number: call.uuid.uuidString)
@@ -120,7 +140,7 @@ extension CallsSensor: CXCallObserverDelegate {
             if let observer = self.CONFIG.sensorObserver{
                 observer.onRinging(number: call.uuid.uuidString)
             }
-            lastCallEventType = CallEventType.outgoing.rawValue
+            lastCallEventType = CallEventType.outgoing
         }
         
         if call.isOutgoing == false && call.hasConnected == false && call.hasEnded == false {
@@ -128,7 +148,7 @@ extension CallsSensor: CXCallObserverDelegate {
             if let observer = self.CONFIG.sensorObserver{
                 observer.onRinging(number: call.uuid.uuidString)
             }
-            lastCallEventType = CallEventType.incoming.rawValue
+            lastCallEventType = CallEventType.incoming
         }
         
         if call.hasConnected == true && call.hasEnded == false {
@@ -142,9 +162,9 @@ extension CallsSensor: CXCallObserverDelegate {
             lastCallEvent = call
             lastCallEventTime = Date()
             if call.isOutgoing {
-                lastCallEventType = CallEventType.outgoing.rawValue
-            }else{
-                lastCallEventType = CallEventType.incoming.rawValue
+                lastCallEventType = CallEventType.outgoing
+            } else {
+                lastCallEventType = CallEventType.incoming
             }
         }
     }
@@ -152,14 +172,14 @@ extension CallsSensor: CXCallObserverDelegate {
     public func save(call: CXCall){
         if let uwLastCallEvent = self.lastCallEvent,
            let uwLastCallEventTime = self.lastCallEventTime,
-           let uwLastCallEventType = self.lastCallEventType{
+           let uwLastCallEventType = self.lastCallEventType {
             
             let now = Date()
             let data = CallsData()
             data.timestamp = Date().timeIntervalSince1970 * 1000
             data.trace = uwLastCallEvent.uuid.uuidString
             data.duration = Int64(now.timeIntervalSince1970 - uwLastCallEventTime.timeIntervalSince1970)
-            data.type = uwLastCallEventType
+            data.type = uwLastCallEventType.stringValue
 
             self.CONFIG.sensorObserver?.onCall(data: data)
             // data.type = eventType
