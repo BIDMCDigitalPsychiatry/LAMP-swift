@@ -64,7 +64,7 @@ public class CallsSensor: NSObject, ISensorController {
         }
     }
     
-    public var CONFIG = Config()
+    public var config = Config()
     
     var callObserver: CXCallObserver? = nil
     
@@ -91,7 +91,7 @@ public class CallsSensor: NSObject, ISensorController {
     
     public init(_ config:CallsSensor.Config){
         super.init()
-        CONFIG = config
+        self.config = config
     }
     
     public func start() {
@@ -127,8 +127,8 @@ extension CallsSensor: CXCallObserverDelegate {
         print(call.isOutgoing, call.isOnHold, call.hasEnded, call.hasConnected)
         if call.hasEnded == true && call.isOutgoing == false || // in-coming end
            call.hasEnded == true && call.isOutgoing == true {   // out-going end
-            if self.CONFIG.debug { print("Disconnected") }
-            if let observer = self.CONFIG.sensorObserver{
+            if self.config.debug { print("Disconnected") }
+            if let observer = self.config.sensorObserver{
                 observer.onFree(number: call.uuid.uuidString)
             }
             print("call save")
@@ -136,24 +136,24 @@ extension CallsSensor: CXCallObserverDelegate {
         }
 
         if call.isOutgoing == true && call.hasConnected == false && call.hasEnded == false {
-            if self.CONFIG.debug { print("Dialing") }
-            if let observer = self.CONFIG.sensorObserver{
+            if self.config.debug { print("Dialing") }
+            if let observer = self.config.sensorObserver{
                 observer.onRinging(number: call.uuid.uuidString)
             }
             lastCallEventType = CallEventType.outgoing
         }
         
         if call.isOutgoing == false && call.hasConnected == false && call.hasEnded == false {
-            if self.CONFIG.debug { print("Incoming") }
-            if let observer = self.CONFIG.sensorObserver{
+            if self.config.debug { print("Incoming") }
+            if let observer = self.config.sensorObserver{
                 observer.onRinging(number: call.uuid.uuidString)
             }
             lastCallEventType = CallEventType.incoming
         }
         
         if call.hasConnected == true && call.hasEnded == false {
-            if self.CONFIG.debug { print("Connected") }
-            if let observer = self.CONFIG.sensorObserver{
+            if self.config.debug { print("Connected") }
+            if let observer = self.config.sensorObserver{
                 observer.onBusy(number: call.uuid.uuidString)
             }
             //self.notificationCenter.post(name: .actionLampCallAccepted, object: self)
@@ -181,7 +181,7 @@ extension CallsSensor: CXCallObserverDelegate {
             data.duration = Int64(now.timeIntervalSince1970 - uwLastCallEventTime.timeIntervalSince1970)
             data.type = uwLastCallEventType.stringValue
 
-            self.CONFIG.sensorObserver?.onCall(data: data)
+            self.config.sensorObserver?.onCall(data: data)
             // data.type = eventType
             self.lastCallEvent = nil
             lastCallEventTime = nil

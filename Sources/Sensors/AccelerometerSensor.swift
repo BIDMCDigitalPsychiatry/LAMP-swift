@@ -6,12 +6,7 @@ public class AccelerometerData {
     public var timestamp: Double
     public var acceleration: CMAcceleration
     
-    init(_ acceleration: CMAcceleration) {
-        self.acceleration = acceleration
-        timestamp = Date().timeIntervalSince1970 * 1000
-    }
-    
-    init(_ acceleration: CMAcceleration, timeStamp: TimeInterval) {
+    init(_ acceleration: CMAcceleration, timeStamp: TimeInterval = Date().timeIntervalSince1970) {
         self.acceleration = acceleration
         self.timestamp = timeStamp * 1000
     }
@@ -20,7 +15,7 @@ public class AccelerometerData {
 public class AccelerometerSensor: ISensorController {
     
     /// config ///
-    public var CONFIG = AccelerometerSensor.Config()
+    public var config = AccelerometerSensor.Config()
     
     private var motionManager: CMMotionManager
     public var LAST_VALUE: CMAccelerometerData?
@@ -30,9 +25,9 @@ public class AccelerometerSensor: ISensorController {
         return o
     }()
     
-    public class Config: SensorConfig{
+    public class Config: SensorConfig {
         
-        public var period: Double  = 1 // min
+        public var period: Double  = 1 // second
         public var frequency: Int = 5 // Hz
         /**
          * Accelerometer threshold (Double).  Do not record consecutive points if
@@ -71,7 +66,7 @@ public class AccelerometerSensor: ISensorController {
     }
     
     public init(_ config:AccelerometerSensor.Config) {
-        self.CONFIG = config
+        self.config = config
         motionManager = CMMotionManager()
         if config.debug { print("Accelerometer sensor is created.") }
     }
@@ -82,10 +77,10 @@ public class AccelerometerSensor: ISensorController {
                 guard let data = data else {
                     return
                 }
-                self.CONFIG.sensorObserver?.onDataChanged(data: AccelerometerData(data.acceleration))
+                self.config.sensorObserver?.onDataChanged(data: AccelerometerData(data.acceleration))
             }
             
-            motionManager.accelerometerUpdateInterval = 1.0/Double(CONFIG.frequency)
+            motionManager.accelerometerUpdateInterval = 1.0 / Double(config.frequency)
             motionManager.startAccelerometerUpdates(to: opQueue, withHandler: handler)
         }
     }

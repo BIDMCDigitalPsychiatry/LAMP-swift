@@ -14,7 +14,7 @@ public class GyroscopeData {
 
 public class GyroscopeSensor: ISensorController {
     
-    public var CONFIG = GyroscopeSensor.Config()
+    public var config = GyroscopeSensor.Config()
     private var motionManager: CMMotionManager
     public var LAST_DATA:CMGyroData?
     private let opQueue: OperationQueue = {
@@ -28,8 +28,8 @@ public class GyroscopeSensor: ISensorController {
          * The defualt value of Android is 200000 microsecond.
          * The value means 5Hz
          */
-        public var frequency:Int  = 5 // Hz
-        public var period:Double  = 1 // min
+        public var frequency: Int  = 5 // Hz
+        public var period: Double  = 1 // Second
         /**
          * Accelerometer threshold (Double).  Do not record consecutive points if
          * change in value of all axes is less than this.
@@ -67,14 +67,14 @@ public class GyroscopeSensor: ISensorController {
     }
     
     public init(_ config:GyroscopeSensor.Config){
-        self.CONFIG = config
+        self.config = config
         motionManager = CMMotionManager()
         if config.debug{ print("Gyroscope sensor is created.") }
     }
     
     public func start() {
         if self.motionManager.isGyroAvailable {
-            self.motionManager.gyroUpdateInterval = 1.0/Double(CONFIG.frequency)
+            self.motionManager.gyroUpdateInterval = 1.0 / Double(config.frequency)
             self.motionManager.startGyroUpdates(to: opQueue) { (gyroScopeData, error) in
                 
                 guard let data = gyroScopeData else {
@@ -93,17 +93,17 @@ public class GyroscopeSensor: ISensorController {
                 //                    }
                 //
                 //                    self.LAST_DATA = gyroData
-                self.CONFIG.sensorObserver?.onDataChanged(data: GyroscopeData(data.rotationRate))
+                self.config.sensorObserver?.onDataChanged(data: GyroscopeData(data.rotationRate))
             }
             
-            if self.CONFIG.debug{ print( "Gyroscope sensor active: \(self.CONFIG.frequency) hz") }
+            if self.config.debug{ print( "Gyroscope sensor active: \(self.config.frequency) hz") }
         }
     }
     
     public func stop() {
         if self.motionManager.isGyroAvailable, self.motionManager.isGyroActive {
             self.motionManager.stopGyroUpdates()
-            if self.CONFIG.debug{ print("Gyroscope sensor terminated") }
+            if self.config.debug{ print("Gyroscope sensor terminated") }
         }
     }
 }
