@@ -10,7 +10,7 @@ public class ScreenSensor: ISensorController {
  
     public var latestScreenState: ScreenState?
     var timer: Timer?
-    public var CONFIG = ScreenSensor.Config()
+    public var config = ScreenSensor.Config()
     
     public class Config: SensorConfig {
         
@@ -44,7 +44,7 @@ public class ScreenSensor: ISensorController {
             }
             
             if self?.latestScreenState?.rawValue != screnState.rawValue {
-                self?.CONFIG.sensorObserver?.onDataChanged(data: ScreenStateData(screenState: screnState))
+                self?.config.sensorObserver?.onDataChanged(data: ScreenStateData(screenState: screnState))
             }
             self?.latestScreenState = screnState
         }
@@ -55,12 +55,12 @@ public class ScreenSensor: ISensorController {
     }
     
     public init(_ config: ScreenSensor.Config) {
-        self.CONFIG = config
+        self.config = config
     }
     public func start() {
         
         if timer == nil {
-            timer = Timer.scheduledTimer(timeInterval: CONFIG.interval, target: self, selector: #selector(fetchScreenState), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: config.interval, target: self, selector: #selector(fetchScreenState), userInfo: nil, repeats: true)
         }
     }
     public func stop() {

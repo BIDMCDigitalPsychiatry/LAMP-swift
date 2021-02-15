@@ -5,13 +5,8 @@ public class ActivityData {
     
     public var timestamp: Double
     public var activity: CMMotionActivity
-    
-    init(_ activity: CMMotionActivity) {
-        self.activity = activity
-        timestamp = Date().timeIntervalSince1970 * 1000
-    }
-    
-    init(_ activity: CMMotionActivity, timeStamp: TimeInterval) {
+
+    init(_ activity: CMMotionActivity, timeStamp: TimeInterval = Date().timeIntervalSince1970) {
         self.activity = activity
         self.timestamp = timeStamp * 1000
     }

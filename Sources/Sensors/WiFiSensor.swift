@@ -21,7 +21,7 @@ public protocol WiFiObserver: class {
 
 public class WiFiSensor: ISensorController {
 
-    public var CONFIG = Config()
+    public var config = Config()
     let reachability: Reachability
 
     public class Config: SensorConfig {
@@ -47,7 +47,7 @@ public class WiFiSensor: ISensorController {
     }
     
     public init(_ config: WiFiSensor.Config){
-        CONFIG = config
+        self.config = config
         reachability = try! Reachability()
     }
     public func start() {
@@ -72,7 +72,7 @@ public class WiFiSensor: ISensorController {
                 scanData.ssid = info.ssid
                 scanData.bssid = info.bssid
 
-                if let wifiObserver = self.CONFIG.sensorObserver {
+                if let wifiObserver = self.config.sensorObserver {
                     wifiObserver.onWiFiAPDetected(data: scanData)
                 }
             }
@@ -91,7 +91,7 @@ public class WiFiSensor: ISensorController {
                         //scanData.label = self.CONFIG.label
                         scanData.ssid = info.ssid
                         scanData.bssid = info.bssid
-                        if let observer = self.CONFIG.sensorObserver {
+                        if let observer = self.config.sensorObserver {
                             observer.onWiFiAPDetected(data: scanData)
                         }
                         
@@ -99,7 +99,7 @@ public class WiFiSensor: ISensorController {
                     
                     break
                 case .cellular, .none:
-                    if let observer = self.CONFIG.sensorObserver {
+                    if let observer = self.config.sensorObserver {
                         observer.onWiFiDisabled()
                     }
                     break

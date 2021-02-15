@@ -1,8 +1,11 @@
 import CoreLocation
 
 public protocol LocationsObserver: class {
-    func onLocationChanged(data: LocationsData)
     func onError(_ errType: LocationErrorType)
+}
+
+public protocol LocationsDataObserver: class {
+    func onLocationChanged(data: LocationsData)
 }
 
 public enum LocationErrorType {
@@ -16,13 +19,14 @@ public class LocationsSensor: NSObject, ISensorController {
 
     public let locationManager = CLLocationManager()
     
-    public var CONFIG: LocationsSensor.Config
+    public var config: LocationsSensor.Config
     
     private var lastStoredTime: TimeInterval = Date().timeIntervalSince1970.advanced(by: -4 * 60)
     
     public class Config:SensorConfig {
         
         public weak var sensorObserver: LocationsObserver?
+        public weak var locationDataObserver: LocationsDataObserver?
         //public var geoFences: String? = nil; // TODO: convert the value to CLRegion
         public var statusGps = true
         public var minimumInterval = 0.0//in seconds
@@ -51,7 +55,7 @@ public class LocationsSensor: NSObject, ISensorController {
     }
     
     public init(_ config:LocationsSensor.Config){
-        self.CONFIG = config
+        self.config = config
         super.init()
         self.locationManager.delegate = self;
     }
@@ -61,7 +65,7 @@ public class LocationsSensor: NSObject, ISensorController {
         // Do not start services that aren't available.
         if false == CLLocationManager.locationServicesEnabled() {
             // Location services is not available.
-            CONFIG.sensorObserver?.onError(LocationErrorType.notEnabled)
+            config.sensorObserver?.onError(LocationErrorType.notEnabled)
             return
         }
         
@@ -71,7 +75,7 @@ public class LocationsSensor: NSObject, ISensorController {
             locationManager.requestAlwaysAuthorization()
             return
         case .restricted, .denied:
-            CONFIG.sensorObserver?.onError(LocationErrorType.denied)
+            config.sensorObserver?.onError(LocationErrorType.denied)
             return
         case .authorizedWhenInUse:
             locationManager.requestAlwaysAuthorization()
@@ -96,13 +100,13 @@ public class LocationsSensor: NSObject, ISensorController {
         locationManager.pausesLocationUpdatesAutomatically = false
         //locationManager.showsBackgroundLocationIndicator = false
         #endif
-        locationManager.desiredAccuracy = CONFIG.accuracy
+        locationManager.desiredAccuracy = config.accuracy
         locationManager.allowsBackgroundLocationUpdates = true
         // locationManager.distanceFilter = CONFIG.minGpsAccuracy // In meters.
         // Configure and start the service.
         // locationManager.activityType = CLActivityType.other
 
-        if self.CONFIG.statusGps {
+        if self.config.statusGps {
             locationManager.startUpdatingLocation()
             #if os(iOS)
             locationManager.startMonitoringSignificantLocationChanges()
@@ -112,7 +116,7 @@ public class LocationsSensor: NSObject, ISensorController {
     }
     
     func stopLocationServices(){
-        if self.CONFIG.statusGps {
+        if self.config.statusGps {
             locationManager.stopUpdatingLocation()
             #if os(iOS)
             locationManager.stopMonitoringSignificantLocationChanges()
@@ -124,7 +128,7 @@ public class LocationsSensor: NSObject, ISensorController {
 extension LocationsSensor: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if self.CONFIG.debug { print(#function) }
+        if self.config.debug { print(#function) }
         switch status {
         case .authorizedAlways:
             self.start()
@@ -133,7 +137,7 @@ extension LocationsSensor: CLLocationManagerDelegate {
             self.start()
             break
         case .restricted, .denied:
-            CONFIG.sensorObserver?.onError(LocationErrorType.denied)
+            config.sensorObserver?.onError(LocationErrorType.denied)
             break
         default:
             break
@@ -142,7 +146,7 @@ extension LocationsSensor: CLLocationManagerDelegate {
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        guard let observer = CONFIG.sensorObserver else { return }
+        guard let dataObserver = config.locationDataObserver else { return }
         let sortedLocations = locations.sorted { (l1, l2) -> Bool in
             return l1.timestamp.compare(l2.timestamp) != .orderedDescending
         }
@@ -154,9 +158,9 @@ extension LocationsSensor: CLLocationManagerDelegate {
             }
             if abs(newestLocation.timestamp.timeIntervalSinceNow) < 60 {
                 let locationStamp = newestLocation.timestamp.timeIntervalSince1970
-                if (locationStamp - lastStoredTime) > CONFIG.minimumInterval {
+                if (locationStamp - lastStoredTime) > config.minimumInterval {
                     //self.saveLocations(newestLocation, eventTime: newestLocation.timestamp)
-                    observer.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
+                    dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
                     lastStoredTime = locationStamp
                 }
             }
@@ -165,8 +169,8 @@ extension LocationsSensor: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         //let msg = String(format: Logs.Messages.location_error, error.localizedDescription)
-        CONFIG.sensorObserver?.onError(LocationErrorType.otherErrors(error))
-        if self.CONFIG.debug { print(error) }
+        config.sensorObserver?.onError(LocationErrorType.otherErrors(error))
+        if self.config.debug { print(error) }
     }
     
 }

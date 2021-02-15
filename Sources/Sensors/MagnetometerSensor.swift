@@ -3,17 +3,22 @@ import CoreMotion
 public class MagnetometerData {
     
     public var timestamp: Double
-    public var magnetoData: CMMagneticField
+    public var caliberatedMagneticData: CMCalibratedMagneticField?
+    public var magneticData: CMMagneticField?
     
-    init(_ magnetoData: CMMagneticField) {
-        self.magnetoData = magnetoData
+    init(_ caliberatedMagnetoData: CMCalibratedMagneticField) {
+        self.caliberatedMagneticData = caliberatedMagnetoData
+        timestamp = Date().timeIntervalSince1970 * 1000
+    }
+    init(_ magneticData: CMMagneticField) {
+        self.magneticData = magneticData
         timestamp = Date().timeIntervalSince1970 * 1000
     }
 }
 
 public class MagnetometerSensor: ISensorController {
     
-    public var CONFIG = Config()
+    public var config = Config()
     var motionManager: CMMotionManager
     var LAST_DATA: CMMagneticField?
     private let opQueue: OperationQueue = {
@@ -81,14 +86,14 @@ public class MagnetometerSensor: ISensorController {
     }
     
     public init(_ config:MagnetometerSensor.Config) {
-        self.CONFIG = config
+        self.config = config
         motionManager = CMMotionManager()
         if config.debug{ print("Magnetometer sensor is created. ") }
     }
     
     public func start() {
         if self.motionManager.isMagnetometerAvailable && !self.motionManager.isMagnetometerActive {
-            self.motionManager.magnetometerUpdateInterval = 1.0/Double(CONFIG.frequency)
+            self.motionManager.magnetometerUpdateInterval = 1.0 / Double(config.frequency)
             self.motionManager.startMagnetometerUpdates(to: opQueue) { (magnetometerData, error) in
                 
                 guard let data = magnetometerData else {
@@ -106,7 +111,7 @@ public class MagnetometerSensor: ISensorController {
                 //                        }
                 //                    }
                 //                    self.LAST_DATA = magData.magneticField
-                self.CONFIG.sensorObserver?.onDataChanged(data: MagnetometerData(data.magneticField))
+                self.config.sensorObserver?.onDataChanged(data: MagnetometerData(data.magneticField))
             }
         }
     }

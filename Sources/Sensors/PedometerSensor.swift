@@ -21,7 +21,7 @@ public class PedometerData: LampSensorCoreObject {
 public class PedometerSensor: ISensorController {
     
     public static let TAG = "LAMP::Pedometer"
-    public var CONFIG: PedometerSensor.Config = Config()
+    public var config: PedometerSensor.Config = Config()
     
     var pedometer: CMPedometer
     
@@ -48,7 +48,7 @@ public class PedometerSensor: ISensorController {
     }
     
     public init(_ config: PedometerSensor.Config) {
-        CONFIG = config
+        self.config = config
         pedometer = CMPedometer()
     }
     
@@ -106,7 +106,7 @@ public class PedometerSensor: ISensorController {
                         data.floorsDescended = floorsDescended.intValue
                     }
                     
-                    self?.CONFIG.sensorObserver?.onPedometerChanged(data: data)
+                    self?.config.sensorObserver?.onPedometerChanged(data: data)
 
                 }
             }

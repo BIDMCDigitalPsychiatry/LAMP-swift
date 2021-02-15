@@ -17,7 +17,7 @@ public class MotionData {
     
     public var acceleration: CMAcceleration
     public var rotationRate: CMRotationRate
-    //public var magneticField: CMMagneticField
+    public var magneticField: CMMagneticField
     public var gravity: CMAcceleration
     public var deviceAttitude: DeviceAttitude
     
@@ -26,7 +26,7 @@ public class MotionData {
         timestamp = Date().timeIntervalSince1970 * 1000
         self.acceleration = deviceMotion.userAcceleration
         self.rotationRate = deviceMotion.rotationRate
-        //self.magneticField = deviceMotion.magneticField.field//we can check accuracy here
+        self.magneticField = deviceMotion.magneticField.field//we can check accuracy here
         self.gravity = deviceMotion.gravity
         self.deviceAttitude = DeviceAttitude(roll: deviceMotion.attitude.roll, pitch: deviceMotion.attitude.pitch, yaw: deviceMotion.attitude.yaw)
     }
@@ -36,7 +36,7 @@ public class MotionData {
 public class MotionSensor: ISensorController {
     
     /// config ///
-    public var CONFIG = MotionSensor.Config()
+    public var config = MotionSensor.Config()
     
     private var motionManager: CMMotionManager
     private let opQueue: OperationQueue = {
@@ -120,12 +120,12 @@ public class MotionSensor: ISensorController {
                 guard let data = data else {
                     return
                 }
-                self.CONFIG.sensorObserver?.onDataChanged(data: MotionData(data))
+                self.config.sensorObserver?.onDataChanged(data: MotionData(data))
             }
             
-            motionManager.deviceMotionUpdateInterval = 1.0/Double(CONFIG.frequency)
+            motionManager.deviceMotionUpdateInterval = 1.0/Double(config.frequency)
             motionManager.startDeviceMotionUpdates(to: opQueue, withHandler: handler)
-            if self.CONFIG.debug{ print( "DeviceMotion sensor active: \(self.CONFIG.frequency) hz") }
+            if self.config.debug{ print( "DeviceMotion sensor active: \(self.config.frequency) hz") }
         }
     }
     
@@ -156,7 +156,7 @@ public class MotionSensor: ISensorController {
     }
     
     public init(_ config:MotionSensor.Config) {
-        self.CONFIG = config
+        self.config = config
         motionManager = CMMotionManager()
         if config.debug { print("Accelerometer sensor is created.") }
     }
