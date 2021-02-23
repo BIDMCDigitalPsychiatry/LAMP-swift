@@ -84,11 +84,11 @@ extension HKCategoryValueSleepAnalysis: TextPresentation {
     var stringValue: String? {
         switch self {
         case .inBed:
-            return "In Bed"
+            return "in_bed"
         case .asleep:
-            return "In Sleep"
+            return "asleep"
         case .awake:
-            return "In Awake"
+            return "awake"
         @unknown default:
             return nil
         }

@@ -32,7 +32,7 @@ extension HKQuantityTypeIdentifier: LampDataKeysProtocol {
         
         switch self {
         case .stepCount:
-            return "lamp.step_count"
+            return "lamp.steps"
         case .bloodPressureSystolic:
             return "lamp.blood_pressure"
         case .bloodPressureDiastolic:
@@ -200,7 +200,6 @@ extension HKQuantityTypeIdentifier: LampDataKeysProtocol {
     }
 }
 
-#if os(iOS)
 extension HKCategoryTypeIdentifier: LampDataKeysProtocol {
     
     public var lampIdentifier: String {
@@ -237,7 +236,7 @@ extension HKCategoryTypeIdentifier: LampDataKeysProtocol {
         }
     }
 }
-#endif
+
 extension HKCharacteristicTypeIdentifier: LampDataKeysProtocol {
     
     public var lampIdentifier: String {

@@ -35,6 +35,9 @@ public class LMHealthKitSensor: ISensorController {
     
     public func stop() {}
     var nutritionTypes: [HKQuantityTypeIdentifier] = [.dietaryFatTotal, .dietaryFatPolyunsaturated, .dietaryFatMonounsaturated, .dietaryFatSaturated, .dietaryCholesterol, .dietarySodium, .dietaryCarbohydrates, .dietaryFiber, .dietarySugar, .dietaryEnergyConsumed, .dietaryProtein, .dietaryVitaminA, .dietaryVitaminB6, .dietaryVitaminB12, .dietaryVitaminC, .dietaryVitaminD, .dietaryVitaminE, .dietaryVitaminK, .dietaryCalcium, .dietaryIron, .dietaryThiamin, .dietaryRiboflavin, .dietaryNiacin, .dietaryFolate, .dietaryBiotin, .dietaryPantothenicAcid, .dietaryPhosphorus, .dietaryIodine, .dietaryMagnesium, .dietaryZinc, .dietarySelenium, .dietaryCopper, .dietaryManganese, .dietaryChromium, .dietaryMolybdenum, .dietaryChloride, .dietaryPotassium, .dietaryCaffeine, .dietaryWater]
+    
+    //add all supported healthkit sensors here
+    public static let healthkitSensors = [HKCategoryTypeIdentifier.sleepAnalysis.lampIdentifier, HKQuantityTypeIdentifier.heartRate.lampIdentifier, HKQuantityTypeIdentifier.bloodPressureDiastolic.lampIdentifier, HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier, HKQuantityTypeIdentifier.bodyTemperature.lampIdentifier, HKQuantityTypeIdentifier.oxygenSaturation.lampIdentifier, HKQuantityTypeIdentifier.bloodGlucose.lampIdentifier, HKQuantityTypeIdentifier.dietaryIron.lampIdentifier, HKQuantityTypeIdentifier.stepCount.lampIdentifier]
     //when ever add new data type, then handle the same in fetchHealthKitQuantityData(), extension HKQuantityTypeIdentifier: LampDataKeysProtocol
     public lazy var healthQuantityTypes: [HKSampleType] = {
         
@@ -49,6 +52,9 @@ public class LMHealthKitSensor: ISensorController {
         }
         if sensorsToCollect?.contains(HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier) == true {
             identifiers.append(.respiratoryRate)
+        }
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.stepCount.lampIdentifier) == true {
+            identifiers.append(.stepCount)
         }
         //var identifiers: [HKQuantityTypeIdentifier] = [.heartRate, .bodyMass, .height, .bloodPressureDiastolic, .bloodPressureSystolic, .respiratoryRate, .bodyMassIndex, .bodyFatPercentage, .leanBodyMass, .waistCircumference]
         //identifiers.append(contentsOf: [.stepCount, .distanceWalkingRunning, .distanceCycling, .distanceWheelchair, .basalEnergyBurned, .activeEnergyBurned, .flightsClimbed, .nikeFuel, .appleExerciseTime, .pushCount, .distanceSwimming, .swimmingStrokeCount, .vo2Max, .distanceDownhillSnowSports])
@@ -72,7 +78,7 @@ public class LMHealthKitSensor: ISensorController {
 //        identifiers.append(.headphoneAudioExposure)
 
         for identifier in identifiers {
-            if let quantityType =   HKQuantityType.quantityType(forIdentifier: identifier) {
+            if let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) {
                 quantityTypes.append(quantityType)
             }
         }
@@ -155,8 +161,10 @@ private extension LMHealthKitSensor {
         return arrSampleTypes
     }
     
-    func saveLastRecordedDate(_ date: Date?, for type: HKSampleType) {
-        if let dateToSave = date {
+    func saveLastRecordedDate(_ date: Date?, fetchedTime: Date, for type: HKSampleType) {
+        if let endDate = date {
+            //Suppose the endDate is greater than 'now' then save 'now'. This is to fix if overlapping data from different sources. example to get sleep duration which reside in between bed time duration
+            let dateToSave = endDate > fetchedTime ? fetchedTime : endDate
             let userDefaults = UserDefaults.standard
             let key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
             userDefaults.set(dateToSave, forKey: key)
@@ -192,7 +200,9 @@ extension LMHealthKitSensor {
     public func fetchHealthData() {
         //clearDataArrays()
         //stepcount
-        getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.stepCount.lampIdentifier) == true {
+            getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
+        }
         
         let quantityTypes = healthQuantityTypes
         for type in quantityTypes {
@@ -205,10 +215,15 @@ extension LMHealthKitSensor {
             healthKitData(for: type, from: lastRecordedDate(for: type))
         }
         
-        loadCharachteristicData()
+        if healthCharacteristicTypes.count > 0 {
+            loadCharachteristicData()
+        }
         
-        let workoutType = HKWorkoutType.workoutType()
-        healthKitData(for: workoutType, from: lastRecordedDate(for: workoutType))
+        if sensorsToCollect?.contains(SensorType.lamp_segment.lampIdentifier) == true {
+            let workoutType = HKWorkoutType.workoutType()
+            healthKitData(for: workoutType, from: lastRecordedDate(for: workoutType))
+        }
+        
     }
     
     func loadCharachteristicData() {
@@ -235,7 +250,7 @@ extension LMHealthKitSensor {
             }
             
         } catch let error {
-            print("error = \(error.localizedDescription)")
+            print("birthdayComponents error = \(error.localizedDescription)")
         }
         do {
             let biologicalSex =       try healthStore.biologicalSex()
@@ -246,7 +261,7 @@ extension LMHealthKitSensor {
             data.valueText = unwrappedBiologicalSex.stringValue
             arrData.append(data)
         } catch let error {
-            print("error = \(error.localizedDescription)")
+            print("biologicalSex error = \(error.localizedDescription)")
         }
         
         do {
@@ -258,7 +273,7 @@ extension LMHealthKitSensor {
             data.valueText = unwrappedBloodType.stringValue
             arrData.append(data)
         } catch let error {
-            print("error = \(error.localizedDescription)")
+            print("bloodType error = \(error.localizedDescription)")
         }
         
         do {
@@ -270,7 +285,7 @@ extension LMHealthKitSensor {
             data.valueText = unwrappedWheelChairUse.stringValue
             arrData.append(data)
         } catch let error {
-            print("error = \(error.localizedDescription)")
+            print("wheelcharirUse error = \(error.localizedDescription)")
         }
         do {
             let skinType =            try healthStore.fitzpatrickSkinType()
@@ -281,7 +296,7 @@ extension LMHealthKitSensor {
             data.valueText = unWrappedSkinType.stringValue
             arrData.append(data)
         } catch let error {
-            print("error = \(error.localizedDescription)")
+            print("skinType error = \(error.localizedDescription)")
         }
         arrCharacteristicData.append(contentsOf: arrData)
     }
@@ -340,10 +355,10 @@ extension LMHealthKitSensor {
         }
         
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
-        
+      
         let today = Date()
         let predicate = HKQuery.predicateForSamples(withStart: start, end: today, options: HKQueryOptions.strictStartDate)
-        
+
         let quantityQuery = HKSampleQuery(sampleType: type, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { [weak self] (query, sampleObjects, error) in
             
             guard let type = query.objectType as? HKSampleType else { return }
@@ -356,17 +371,18 @@ extension LMHealthKitSensor {
                 
                 self?.saveQuantityData(samples, for: type)
                 let lastDate = samples.last?.endDate.addingTimeInterval(1)
-                self?.saveLastRecordedDate(lastDate, for: type)
+                self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
             } else if let samples = sampleObjects as? [HKCategorySample] {
                 
+                print("samples cnt = \(samples.count)")
                 self?.saveCategoryData(samples, for: type)
                 let lastDate = samples.last?.endDate.addingTimeInterval(1)
-                self?.saveLastRecordedDate(lastDate, for: type)
+                self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
             } else if let samples = sampleObjects as? [HKWorkout] {
                 
                 self?.saveWorkoutData(samples, for: type)
                 let lastDate = samples.last?.endDate.addingTimeInterval(1)
-                self?.saveLastRecordedDate(lastDate, for: type)
+                self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
             }
         }
         healthStore.execute(quantityQuery)
@@ -404,6 +420,7 @@ extension LMHealthKitSensor {
             data.startDate = sample.startDate.timeIntervalSince1970 * 1000
             data.endDate   = sample.endDate.timeIntervalSince1970 * 1000
             data.hkIdentifier = typeIdentifier
+            data.source = sample.sourceRevision.source.bundleIdentifier
             if let meta = sample.metadata {
                 data.metadata = meta
             }

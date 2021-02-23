@@ -9,23 +9,23 @@ import Foundation
 
 /** An activity that may be performed by a participant in a study. */
 public struct Activity: Codable {
-
+    
     /** A globally unique reference for objects. */
     public var id: String?
     /** A globally unique reference for objects. */
     public var spec: String?
     /** The name of the activity. */
     public var name: String?
-    public var schedule: DurationIntervalLegacy?
+    public var schedule: [DurationIntervalLegacy]?
     /** The configuration settings for the activity. */
-    public var settings: AnyCodable?
+    //public var settings: [AnyCodable]?
 
-    public init(id: String? = nil, spec: String? = nil, name: String? = nil, schedule: DurationIntervalLegacy? = nil, settings: AnyCodable? = nil) {
+    public init(id: String? = nil, spec: String? = nil, name: String? = nil, schedule: [DurationIntervalLegacy]? = nil) {
         self.id = id
         self.spec = spec
         self.name = name
         self.schedule = schedule
-        self.settings = settings
+        //self.settings = settings
     }
 
 }

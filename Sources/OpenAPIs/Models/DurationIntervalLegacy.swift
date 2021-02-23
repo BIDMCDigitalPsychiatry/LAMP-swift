@@ -9,22 +9,34 @@ import Foundation
 //import AnyCodable
 
 public struct DurationIntervalLegacy: Codable {
-
-    public var repeatType: String?
-    /** The UNIX Epoch date-time representation: number of milliseconds since 1/1/1970 12:00 AM. */
-    public var date: Double?
-    public var customTimes: [AnyCodable]?
-
-    public init(repeatType: String? = nil, date: Double? = nil, customTimes: [AnyCodable]? = nil) {
-        self.repeatType = repeatType
-        self.date = date
-        self.customTimes = customTimes
+    
+    public enum RepeatType: String, Codable {
+        case custom
+        case daily
+        case hourly
+        case monthly
+        case none
+        
+        public enum CodingKeys: String, CodingKey {
+            case custom
+            case daily
+            case hourly
+            case monthly
+            case none
+        }
     }
 
+    public var repeatType: RepeatType?
+    /** The UNIX Epoch date-time representation: number of milliseconds since 1/1/1970 12:00 AM. */
+    public var startDate: Date?
+    public var time: Date?
+    public var customTimes: [Date]?
+
     public enum CodingKeys: String, CodingKey, CaseIterable {
-        case repeatType = "repeat_type"
-        case date
-        case customTimes = "custom_times"
+        case repeatType = "repeat_interval"
+        case startDate = "start_date"
+        case customTimes = "custom_time"
+        case time
     }
 
 }
