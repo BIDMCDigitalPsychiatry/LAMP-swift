@@ -100,7 +100,7 @@ extension HKCategoryValueAudioExposureEvent: TextPresentation {
     var stringValue: String? {
         switch self {
         case .loudEnvironment:
-            return "Loud Environment"
+            return "loud_environment"
         @unknown default:
             return nil
         }
@@ -111,15 +111,15 @@ extension HKCategoryValueMenstrualFlow: TextPresentation {
     var stringValue: String? {
         switch self {
         case .unspecified:
-            return "Unspecified"
+            return "unspecified"
         case .light:
-            return "Light"
+            return "light"
         case .medium:
-            return "Medium"
+            return "medium"
         case .heavy:
-            return "Heavy"
+            return "heavy"
         case .none:
-            return "None"
+            return "none"
         @unknown default:
             return nil
         }
@@ -131,13 +131,13 @@ extension HKCategoryValueOvulationTestResult: TextPresentation {
         switch self {
             
         case .negative:
-            return "Negative"
+            return "negative"
         case .luteinizingHormoneSurge:
-            return "Luteinizing Hormone Surge"
+            return "luteinizing_hormone_surge"
         case .indeterminate:
-            return "Indeterminate"
+            return "indeterminate"
         case .estrogenSurge:
-            return "Estrogen Surge"
+            return "estrogen_surge"
         @unknown default:
             return nil
         }
@@ -148,15 +148,15 @@ extension HKCategoryValueCervicalMucusQuality: TextPresentation {
     var stringValue: String? {
         switch self {
         case .dry:
-            return "Dry"
+            return "dry"
         case .sticky:
-            return "Sticky"
+            return "sticky"
         case .creamy:
-            return "Creamy"
+            return "creamy"
         case .watery:
-            return "Watery"
+            return "watery"
         case .eggWhite:
-            return "Egg White"
+            return "egg_white"
         @unknown default:
             return nil
         }
@@ -167,9 +167,9 @@ extension HKCategoryValueAppleStandHour: TextPresentation {
     var stringValue: String? {
         switch self {
         case .stood:
-            return "Stood"
+            return "stood"
         case .idle:
-            return "Idle"
+            return "idle"
         @unknown default:
             return nil
         }
@@ -181,7 +181,7 @@ extension HKBiologicalSex: TextPresentation {
         switch self {
             
         case .notSet:
-            return "Not Set"
+            return "not_set"
         case .female:
             return "female"
         case .male:
@@ -200,7 +200,7 @@ extension HKBloodType: TextPresentation {
             
             
         case .notSet:
-            return "Not Set"
+            return "not_set"
         case .aPositive:
             return "A Positive"
         case .aNegative:
@@ -229,11 +229,11 @@ extension HKWheelchairUse: TextPresentation {
         switch self {
             
         case .notSet:
-            return "Not Set"
+            return "not_set"
         case .no:
-            return "No"
+            return "no"
         case .yes:
-            return "Yes"
+            return "yes"
         @unknown default:
             return nil
         }

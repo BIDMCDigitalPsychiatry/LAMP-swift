@@ -244,7 +244,7 @@ extension LMHealthKitSensor {
             
             if let date = Calendar.current.date(from: birthdayComponents) {
                 let data = LMHealthKitCharacteristicData(hkIdentifier: HKCharacteristicTypeIdentifier.dateOfBirth)
-                data.valueText = "\(age)"
+                data.representation = "\(age)"
                 data.value = date.timeIntervalSince1970 * 1000
                 arrData.append(data)
             }
@@ -258,7 +258,7 @@ extension LMHealthKitSensor {
             
             let data = LMHealthKitCharacteristicData(hkIdentifier: HKCharacteristicTypeIdentifier.biologicalSex)
             data.value = Double(unwrappedBiologicalSex.rawValue)
-            data.valueText = unwrappedBiologicalSex.stringValue
+            data.representation = unwrappedBiologicalSex.stringValue
             arrData.append(data)
         } catch let error {
             print("biologicalSex error = \(error.localizedDescription)")
@@ -270,7 +270,7 @@ extension LMHealthKitSensor {
             
             let data = LMHealthKitCharacteristicData(hkIdentifier: HKCharacteristicTypeIdentifier.bloodType)
             data.value = Double(unwrappedBloodType.rawValue)
-            data.valueText = unwrappedBloodType.stringValue
+            data.representation = unwrappedBloodType.stringValue
             arrData.append(data)
         } catch let error {
             print("bloodType error = \(error.localizedDescription)")
@@ -282,7 +282,7 @@ extension LMHealthKitSensor {
             
             let data = LMHealthKitCharacteristicData(hkIdentifier: HKCharacteristicTypeIdentifier.wheelchairUse)
             data.value = Double(unwrappedWheelChairUse.rawValue)
-            data.valueText = unwrappedWheelChairUse.stringValue
+            data.representation = unwrappedWheelChairUse.stringValue
             arrData.append(data)
         } catch let error {
             print("wheelcharirUse error = \(error.localizedDescription)")
@@ -293,7 +293,7 @@ extension LMHealthKitSensor {
             
             let data = LMHealthKitCharacteristicData(hkIdentifier: HKCharacteristicTypeIdentifier.fitzpatrickSkinType)
             data.value = Double(unWrappedSkinType.rawValue)
-            data.valueText = unWrappedSkinType.stringValue
+            data.representation = unWrappedSkinType.stringValue
             arrData.append(data)
         } catch let error {
             print("skinType error = \(error.localizedDescription)")

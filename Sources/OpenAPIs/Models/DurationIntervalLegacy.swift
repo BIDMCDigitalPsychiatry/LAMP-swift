@@ -39,5 +39,11 @@ public struct DurationIntervalLegacy: Codable {
         case time
     }
 
+    public init(repeatType: RepeatType?, startDate: Date?, time: Date?, customTimes: [Date]?) {
+        self.repeatType = repeatType
+        self.startDate = startDate
+        self.time = time
+        self.customTimes = customTimes
+    }
 }
 
