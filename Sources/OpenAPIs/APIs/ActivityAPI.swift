@@ -11,6 +11,10 @@ import Combine
 
 
 open class ActivityAPI {
+    
+    public struct Response: Decodable {
+        public let data: [Activity]
+    }
     /**
      Get the set of all activities.
      
@@ -66,8 +70,8 @@ open class ActivityAPI {
      - returns: AnyPublisher<[Any], Error>
      */
     @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    open class func activityAllByParticipant(participantId: String, transform: String? = nil, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<[Any], Error> {
-        return Future<[Any], Error>.init { promise in
+    open class func activityAllByParticipant(participantId: String, transform: String? = nil, apiResponseQueue: DispatchQueue = OpenAPIClientAPI.apiResponseQueue) -> AnyPublisher<ActivityAPI.Response, Error> {
+        return Future<ActivityAPI.Response, Error>.init { promise in
             activityAllByParticipantWithRequestBuilder(participantId: participantId, transform: transform).execute(apiResponseQueue) { result -> Void in
                 switch result {
                 case let .success(response):
@@ -90,7 +94,7 @@ open class ActivityAPI {
      - parameter transform: (query)  (optional)
      - returns: RequestBuilder<[Any]> 
      */
-    open class func activityAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<[AnyCodable]> {
+    open class func activityAllByParticipantWithRequestBuilder(participantId: String, transform: String? = nil) -> RequestBuilder<ActivityAPI.Response> {
         var path = "/participant/{participant_id}/activity"
         let participantIdPreEscape = "\(APIHelper.mapValueToPathItem(participantId))"
         let participantIdPostEscape = participantIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -103,7 +107,7 @@ open class ActivityAPI {
             "transform": transform?.encodeToJSON()
         ])
 
-        let requestBuilder: RequestBuilder<[AnyCodable]>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<ActivityAPI.Response>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
     }

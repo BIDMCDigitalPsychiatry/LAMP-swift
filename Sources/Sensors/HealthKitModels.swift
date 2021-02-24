@@ -10,9 +10,10 @@ public class LMHealthKitCharacteristicData: LampSensorCoreObject {
     public var metadata: [String: Any]?
     public var type: String = ""  // eg: HKQuantityTypeIdentifier
     public var value: Double?  // e.g., 60
-    public var valueText: String?  // e.g., 60
+    public var representation: String?  // e.g., 60
     public var unit: String? // e.g., count/min
     public var hkIdentifier: HKCharacteristicTypeIdentifier
+    public var source: String?
     
     public init(hkIdentifier: HKCharacteristicTypeIdentifier) {
         self.hkIdentifier = hkIdentifier
@@ -32,7 +33,7 @@ public class LMHealthKitQuantityData: LampSensorCoreObject {
     public var metadata: [String: Any]?
     public var type: String = ""  // eg: HKQuantityTypeIdentifier
     public var value: Double?  // e.g., 60
-    public var valueText: String?  // e.g., 60
+    public var representation: String?  // e.g., 60
     public var unit: String? // e.g., count/min
     public var hkIdentifier: HKQuantityTypeIdentifier
     
@@ -70,15 +71,19 @@ public class LMHealthKitCategoryData: LampSensorCoreObject {
     public var metadata: [String: Any]?
     public var type: String = ""  // eg: HKQuantityTypeIdentifier
     public var value: Double?  // e.g., 60
-    public var valueText: String?  // e.g., 60
+    public var representation: String?  // e.g., 60
     public var unit: String? // e.g., count/min
     public var hkIdentifier: HKCategoryTypeIdentifier
+    public var source: String?
+    public var duration: Double?
     
     public var timestamp: Double {
         return endDate ?? Double(timestampInternal)
     }
     
     public init(_ sample: HKCategorySample) {
+        
+        let id = sample.sourceRevision.source.bundleIdentifier
         
         let typeIdentifier = HKCategoryTypeIdentifier(rawValue: sample.categoryType.identifier)
         self.hkIdentifier = typeIdentifier
@@ -88,32 +93,34 @@ public class LMHealthKitCategoryData: LampSensorCoreObject {
             self.device = json
         }
         self.type = sample.categoryType.identifier
+        self.source = id
         
         switch typeIdentifier {
         case .sleepAnalysis:
+            self.duration = sample.endDate.timeIntervalSince(sample.startDate) * 1000//to convert to milliseconds
             self.value = Double(sample.value)
             if let sleepAnalysis = HKCategoryValueSleepAnalysis(rawValue: sample.value) {
-                self.valueText = sleepAnalysis.stringValue
+                self.representation = sleepAnalysis.stringValue
             }
         case .appleStandHour:
             self.value = Double(sample.value)
             if let standHour = HKCategoryValueAppleStandHour(rawValue: sample.value) {
-                self.valueText = standHour.stringValue
+                self.representation = standHour.stringValue
             }
         case .cervicalMucusQuality:
             self.value = Double(sample.value)
             if let quality = HKCategoryValueCervicalMucusQuality(rawValue: sample.value) {
-                self.valueText = quality.stringValue
+                self.representation = quality.stringValue
             }
         case .ovulationTestResult:
             self.value = Double(sample.value)
             if let obj = HKCategoryValueOvulationTestResult(rawValue: sample.value) {
-                self.valueText = obj.stringValue
+                self.representation = obj.stringValue
             }
         case .menstrualFlow:
             self.value = Double(sample.value)
             if let obj = HKCategoryValueMenstrualFlow(rawValue: sample.value) {
-                self.valueText = obj.stringValue
+                self.representation = obj.stringValue
             }
         default:
             self.value = Double(sample.value)
@@ -123,7 +130,7 @@ public class LMHealthKitCategoryData: LampSensorCoreObject {
             if typeIdentifier == .audioExposureEvent {
                 self.value = Double(sample.value)
                 if let obj = HKCategoryValueAudioExposureEvent(rawValue: sample.value) {
-                    self.valueText = obj.stringValue
+                    self.representation = obj.stringValue
                 }
             }
         }
@@ -145,9 +152,10 @@ public class LMHealthKitWorkoutData: LampSensorCoreObject {
     public var metadata: [String: Any]?
     public var type: String = ""  // eg: HKQuantityTypeIdentifier
     public var duration: Double?  // e.g., 60
-    public var valueText: String?  // e.g., 60
+    public var representation: String?  // e.g., 60
     public var unit: String? // e.g., count/min
-
+    public var source: String?
+    
     public var timestamp: Double {
         return endDate ?? Double(timestampInternal)
     }
@@ -162,6 +170,7 @@ public class LMHealthKitWorkoutData: LampSensorCoreObject {
         self.duration = sample.duration
         self.startDate = sample.startDate.timeIntervalSince1970 * 1000
         self.endDate   = sample.endDate.timeIntervalSince1970 * 1000
+        self.source = sample.sourceRevision.source.bundleIdentifier
         if let meta = sample.metadata {
             self.metadata = meta
         }
