@@ -44,7 +44,8 @@ public class ScreenSensor: ISensorController {
             }
             
             if self?.latestScreenState?.rawValue != screnState.rawValue {
-                self?.config.sensorObserver?.onDataChanged(data: ScreenStateData(screenState: screnState))
+                let screenData = ScreenStateData(batteryLevel: BatteryState.shared.batteryLevel(), screenState: screnState)
+                self?.config.sensorObserver?.onDataChanged(data: screenData)
             }
             self?.latestScreenState = screnState
         }
