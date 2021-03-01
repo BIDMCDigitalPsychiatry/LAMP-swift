@@ -31,19 +31,22 @@ public struct DurationIntervalLegacy: Codable {
     public var startDate: Date?
     public var time: Date?
     public var customTimes: [Date]?
+    public var notificationId: [Int64]?
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case repeatType = "repeat_interval"
         case startDate = "start_date"
         case customTimes = "custom_time"
         case time
+        case notificationId = "notification_id"
     }
 
-    public init(repeatType: RepeatType?, startDate: Date?, time: Date?, customTimes: [Date]?) {
+    public init(repeatType: RepeatType?, startDate: Date?, time: Date?, customTimes: [Date]?, notificationId: [Int64]?) {
         self.repeatType = repeatType
         self.startDate = startDate
         self.time = time
         self.customTimes = customTimes
+        self.notificationId = notificationId
     }
 }
 

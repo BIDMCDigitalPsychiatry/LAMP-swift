@@ -19,13 +19,13 @@ extension ScreenState: TextPresentation {
     switch self {
     
     case .screen_on:
-        return "Screen On"
+        return "screen_on"
     case .screen_off:
-        return "Screen Off"
+        return "screen_off"
     case .screen_locked:
-        return "Screen Locked"
+        return "locked"
     case .screen_unlocked:
-        return "Screen Unlocked"
+        return "unlocked"
         }
     }
 }

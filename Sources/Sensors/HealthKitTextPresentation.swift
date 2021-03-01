@@ -86,9 +86,9 @@ extension HKCategoryValueSleepAnalysis: TextPresentation {
         case .inBed:
             return "in_bed"
         case .asleep:
-            return "asleep"
+            return "in_sleep"
         case .awake:
-            return "awake"
+            return "in_awake"
         @unknown default:
             return nil
         }
