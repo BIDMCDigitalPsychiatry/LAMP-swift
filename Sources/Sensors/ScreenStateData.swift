@@ -31,7 +31,7 @@ extension ScreenState: TextPresentation {
 }
 
 public struct ScreenStateData {
-    
+    public var batteryLevel: Float?
     public var screenState: ScreenState = .screen_on
     public var timestamp: Double = Date().timeIntervalSince1970 * 1000
 }
