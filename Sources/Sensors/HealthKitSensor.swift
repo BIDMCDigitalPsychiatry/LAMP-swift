@@ -37,7 +37,7 @@ public class LMHealthKitSensor: ISensorController {
     var nutritionTypes: [HKQuantityTypeIdentifier] = [.dietaryFatTotal, .dietaryFatPolyunsaturated, .dietaryFatMonounsaturated, .dietaryFatSaturated, .dietaryCholesterol, .dietarySodium, .dietaryCarbohydrates, .dietaryFiber, .dietarySugar, .dietaryEnergyConsumed, .dietaryProtein, .dietaryVitaminA, .dietaryVitaminB6, .dietaryVitaminB12, .dietaryVitaminC, .dietaryVitaminD, .dietaryVitaminE, .dietaryVitaminK, .dietaryCalcium, .dietaryIron, .dietaryThiamin, .dietaryRiboflavin, .dietaryNiacin, .dietaryFolate, .dietaryBiotin, .dietaryPantothenicAcid, .dietaryPhosphorus, .dietaryIodine, .dietaryMagnesium, .dietaryZinc, .dietarySelenium, .dietaryCopper, .dietaryManganese, .dietaryChromium, .dietaryMolybdenum, .dietaryChloride, .dietaryPotassium, .dietaryCaffeine, .dietaryWater]
     
     //add all supported healthkit sensors here
-    public static let healthkitSensors = [HKCategoryTypeIdentifier.sleepAnalysis.lampIdentifier, HKQuantityTypeIdentifier.heartRate.lampIdentifier, HKQuantityTypeIdentifier.bloodPressureDiastolic.lampIdentifier, HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier, HKQuantityTypeIdentifier.bodyTemperature.lampIdentifier, HKQuantityTypeIdentifier.oxygenSaturation.lampIdentifier, HKQuantityTypeIdentifier.bloodGlucose.lampIdentifier, HKQuantityTypeIdentifier.dietaryIron.lampIdentifier, HKQuantityTypeIdentifier.stepCount.lampIdentifier, SensorType.lamp_segment.lampIdentifier]
+    public static let healthkitSensors = [HKCategoryTypeIdentifier.sleepAnalysis.lampIdentifier, HKQuantityTypeIdentifier.heartRate.lampIdentifier, HKQuantityTypeIdentifier.bloodPressureDiastolic.lampIdentifier, HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier, HKQuantityTypeIdentifier.bodyTemperature.lampIdentifier, HKQuantityTypeIdentifier.oxygenSaturation.lampIdentifier, HKQuantityTypeIdentifier.bloodGlucose.lampIdentifier, HKQuantityTypeIdentifier.dietaryIron.lampIdentifier, HKQuantityTypeIdentifier.stepCount.lampIdentifier, SensorType.lamp_segment.lampIdentifier, HKQuantityTypeIdentifier.heartRateVariabilitySDNN.lampIdentifier]
     //when ever add new data type, then handle the same in fetchHealthKitQuantityData(), extension HKQuantityTypeIdentifier: LampDataKeysProtocol
     public lazy var healthQuantityTypes: [HKSampleType] = {
         
@@ -67,6 +67,9 @@ public class LMHealthKitSensor: ISensorController {
         }
         if sensorsToCollect?.contains(HKQuantityTypeIdentifier.bloodGlucose.lampIdentifier) == true {
             identifiers.append(.bloodGlucose)
+        }
+        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.heartRateVariabilitySDNN.lampIdentifier) == true {
+            identifiers.append(.heartRateVariabilitySDNN)
         }
         //identifiers.append(contentsOf: [.bodyTemperature, .basalBodyTemperature, .restingHeartRate, .walkingHeartRateAverage, .heartRateVariabilitySDNN, .oxygenSaturation, .peripheralPerfusionIndex, .bloodGlucose, .numberOfTimesFallen, .electrodermalActivity, .inhalerUsage, .insulinDelivery, .bloodAlcoholContent, .forcedVitalCapacity, .forcedExpiratoryVolume1, .peakExpiratoryFlowRate])
         if sensorsToCollect?.contains(HKQuantityTypeIdentifier.dietaryIron.lampIdentifier) == true {
