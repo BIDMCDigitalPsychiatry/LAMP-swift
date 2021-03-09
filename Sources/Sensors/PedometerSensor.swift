@@ -87,19 +87,19 @@ public class PedometerSensor: ISensorController {
                     data.startDate = pedoData.startDate.timeIntervalSince1970 * 1000
                     data.endDate = pedoData.endDate.timeIntervalSince1970 * 1000
                     data.numberOfSteps = pedoData.numberOfSteps.intValue
-                    if let currentCadence = pedoData.currentCadence{
+                    if let currentCadence = pedoData.currentCadence {
                         data.currentCadence = currentCadence.doubleValue
                     }
-                    if let currentPace = pedoData.currentPace{
+                    if let currentPace = pedoData.currentPace {
                         data.currentPace = currentPace.doubleValue
                     }
-                    if let distance = pedoData.distance{
+                    if let distance = pedoData.distance {
                         data.distance = distance.doubleValue
                     }
-                    if let averageActivePace = pedoData.averageActivePace{
+                    if let averageActivePace = pedoData.averageActivePace {
                         data.averageActivePace = averageActivePace.doubleValue
                     }
-                    if let floorsAscended = pedoData.floorsAscended{
+                    if let floorsAscended = pedoData.floorsAscended {
                         data.floorsAscended = floorsAscended.intValue
                     }
                     if let floorsDescended = pedoData.floorsDescended {

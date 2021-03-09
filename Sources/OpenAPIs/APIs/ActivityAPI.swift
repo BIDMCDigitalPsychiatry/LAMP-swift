@@ -104,9 +104,8 @@ open class ActivityAPI {
         
         var url = URLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems([
-            "transform": transform?.encodeToJSON()
+            "ignore_binary": true
         ])
-
         let requestBuilder: RequestBuilder<ActivityAPI.Response>.Type = OpenAPIClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)

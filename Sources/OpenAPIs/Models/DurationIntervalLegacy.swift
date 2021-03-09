@@ -11,19 +11,18 @@ import Foundation
 public struct DurationIntervalLegacy: Codable {
     
     public enum RepeatType: String, Codable {
+
+        case hourly
+        case every3h
+        case every6h
+        case every12h
         case custom
         case daily
-        case hourly
+        case biweekly
+        case weekly
+        case bimonthly
         case monthly
         case none
-        
-        public enum CodingKeys: String, CodingKey {
-            case custom
-            case daily
-            case hourly
-            case monthly
-            case none
-        }
     }
 
     public var repeatType: RepeatType?
@@ -38,7 +37,7 @@ public struct DurationIntervalLegacy: Codable {
         case startDate = "start_date"
         case customTimes = "custom_time"
         case time
-        case notificationId = "notification_id"
+        case notificationId = "notification_ids"
     }
 
     public init(repeatType: RepeatType?, startDate: Date?, time: Date?, customTimes: [Date]?, notificationId: [Int64]?) {
