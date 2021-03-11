@@ -16,12 +16,13 @@ public struct DurationIntervalLegacy: Codable {
         case every3h
         case every6h
         case every12h
-        case custom
         case daily
         case biweekly
+        case triweekly
         case weekly
         case bimonthly
         case monthly
+        case custom
         case none
     }
 
