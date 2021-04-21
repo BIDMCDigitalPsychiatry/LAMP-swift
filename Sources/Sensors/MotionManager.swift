@@ -47,13 +47,14 @@ public class MotionManager: ISensorController {
          * change in value of all axes is less than this.
          */
         public var threshold: Double = 0
-        //public var sensorTimerDataStoreInterval: Double = 10.0 * 60.0
+        public var sensorTimerDataStoreInterval: Double = 5.0 * 60.0
         
         public weak var accelerometerObserver: AccelerometerObserver? = nil
         public weak var gyroObserver: GyroscopeObserver? = nil
         public weak var magnetoObserver: MagnetometerObserver? = nil
         public weak var motionObserver: MotionObserver? = nil
-        //public weak var sensorTimerDelegate: SensorStore? = nil
+        
+        public weak var sensorTimerDelegate: SensorStore? = nil
         
         public override init() {
             super.init()
@@ -156,7 +157,7 @@ public class MotionManager: ISensorController {
         
         
     }
-    //var runCount = 0.0
+    var runCount = 0.0
     public func restartMotionUpdates() {
         guard self.shouldRestartMotionUpdates else { return }
         
@@ -181,9 +182,15 @@ public class MotionManager: ISensorController {
             if config.motionObserver != nil {
                 self.motionManager.startAccelerometerUpdates()
             } else {
+                
                 self.motionManager.startAccelerometerUpdates(to: opQueue) { (accelData, error) in
                     if let dataAcc = accelData {
                         self.config.accelerometerObserver?.onDataChanged(data: AccelerometerData(dataAcc.acceleration))
+                    }
+                    self.runCount += 1
+                    if self.runCount > Double(self.config.frequency) * self.config.sensorTimerDataStoreInterval {
+                        self.config.sensorTimerDelegate?.timeToStore()
+                        self.runCount = 0
                     }
                 }
             }
@@ -213,6 +220,12 @@ public class MotionManager: ISensorController {
                 }
                 if let dataMotion = deviceMotion {
                     self.config.motionObserver?.onDataChanged(data: MotionData(dataMotion))
+                }
+                
+                self.runCount += 1
+                if self.runCount > Double(self.config.frequency) * self.config.sensorTimerDataStoreInterval {
+                    self.config.sensorTimerDelegate?.timeToStore()
+                    self.runCount = 0
                 }
             }
         }
