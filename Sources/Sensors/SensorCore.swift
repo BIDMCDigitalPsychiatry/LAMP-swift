@@ -169,9 +169,9 @@ public class SensorManager {
 class Utils {
     static let shared = Utils()
     private init() {}
-    
+
     private let timestampKey = "LMPedometerTimestamp"
-    
+
     func getHealthKitLaunchedTimestamp() -> Date {
         let userDefaults = UserDefaults.standard
         if let date = userDefaults.object(forKey: timestampKey) as? Date {
@@ -181,7 +181,7 @@ class Utils {
         userDefaults.set(newDate, forKey: timestampKey)
         return newDate
     }
-    
+
     func removeAllSavedDates() {
         let userDefaults = UserDefaults.standard
         userDefaults.removeObject(forKey: timestampKey)

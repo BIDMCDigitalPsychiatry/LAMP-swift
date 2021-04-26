@@ -12,6 +12,7 @@ public class PedometerData: LampSensorCoreObject {
     public var floorsAscended: Int  = 0
     public var floorsDescended: Int = 0
     public var averageActivePace: Double = 0
+    public var event: String?
     
     public var timestamp: Double {
         return endDate
@@ -78,36 +79,49 @@ public class PedometerSensor: ISensorController {
             print(PedometerSensor.TAG, "Pedometer Event Tracking is not available.")
         }
         
-        if CMPedometer.isStepCountingAvailable(){
-            let startTime = Utils.shared.getHealthKitLaunchedTimestamp()
-            pedometer.startUpdates(from: startTime) { [weak self] (pedometerData, error) in
-                // save pedometer data
-                if let pedoData = pedometerData {
-                    let data = PedometerData()
-                    data.startDate = pedoData.startDate.timeIntervalSince1970 * 1000
-                    data.endDate = pedoData.endDate.timeIntervalSince1970 * 1000
-                    data.numberOfSteps = pedoData.numberOfSteps.intValue
-                    if let currentCadence = pedoData.currentCadence {
-                        data.currentCadence = currentCadence.doubleValue
-                    }
-                    if let currentPace = pedoData.currentPace {
-                        data.currentPace = currentPace.doubleValue
-                    }
-                    if let distance = pedoData.distance {
-                        data.distance = distance.doubleValue
-                    }
-                    if let averageActivePace = pedoData.averageActivePace {
-                        data.averageActivePace = averageActivePace.doubleValue
-                    }
-                    if let floorsAscended = pedoData.floorsAscended {
-                        data.floorsAscended = floorsAscended.intValue
-                    }
-                    if let floorsDescended = pedoData.floorsDescended {
-                        data.floorsDescended = floorsDescended.intValue
-                    }
-                    
-                    self?.config.sensorObserver?.onPedometerChanged(data: data)
+        if CMPedometer.isStepCountingAvailable() {
 
+            pedometer.startEventUpdates { (event, error) in
+                let startTime = Calendar.current.startOfDay(for: Date())
+                self.pedometer.queryPedometerData(from: startTime, to: Date()) { [weak self] (pedometerData, error) in
+                    if let pedoData = pedometerData {
+                        let data = PedometerData()
+                        if let eventType = event?.type {
+                            switch eventType {
+                            
+                            case .pause:
+                                data.event = "pause"
+                            case .resume:
+                                data.event = "pause"
+                            @unknown default:
+                                ()
+                            }
+                            data.event = (eventType == CMPedometerEventType.pause) ? "pause" : "resume"
+                        }
+                        data.startDate = pedoData.startDate.timeIntervalSince1970 * 1000
+                        data.endDate = pedoData.endDate.timeIntervalSince1970 * 1000
+                        data.numberOfSteps = pedoData.numberOfSteps.intValue
+                        if let currentCadence = pedoData.currentCadence {
+                            data.currentCadence = currentCadence.doubleValue
+                        }
+                        if let currentPace = pedoData.currentPace {
+                            data.currentPace = currentPace.doubleValue
+                        }
+                        if let distance = pedoData.distance {
+                            data.distance = distance.doubleValue
+                        }
+                        if let averageActivePace = pedoData.averageActivePace {
+                            data.averageActivePace = averageActivePace.doubleValue
+                        }
+                        if let floorsAscended = pedoData.floorsAscended {
+                            data.floorsAscended = floorsAscended.intValue
+                        }
+                        if let floorsDescended = pedoData.floorsDescended {
+                            data.floorsDescended = floorsDescended.intValue
+                        }
+                        
+                        self?.config.sensorObserver?.onPedometerChanged(data: data)
+                    }
                 }
             }
         } else {
@@ -117,7 +131,7 @@ public class PedometerSensor: ISensorController {
     }
     
     public func stop() {
-        pedometer.stopUpdates()
+        pedometer.stopEventUpdates()
     }
 }
 
