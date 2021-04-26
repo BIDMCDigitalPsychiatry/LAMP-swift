@@ -25,7 +25,7 @@ public class OpenISO8601DateFormatter: DateFormatter {
         dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
     }
 
-    override init() {
+    public override init() {
         super.init()
         setup()
     }

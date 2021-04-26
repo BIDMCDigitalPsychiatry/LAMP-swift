@@ -164,21 +164,110 @@ private extension LMHealthKitSensor {
         return arrSampleTypes
     }
     
-    func saveLastRecordedDate(_ date: Date?, fetchedTime: Date, for type: HKSampleType) {
+    func saveLastRecordedDate(_ date: Date?, fetchedTime: Date, for type: HKSampleType, source: String? = nil) {
         if let endDate = date {
             //Suppose the endDate is greater than 'now' then save 'now'. This is to fix if overlapping data from different sources. example to get sleep duration which reside in between bed time duration
             let dateToSave = endDate > fetchedTime ? fetchedTime : endDate
             let userDefaults = UserDefaults.standard
-            let key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
+            let key: String
+            if let sourceIdentifier = source  {
+                key = String(format: "LMHealthKit_%@_timestamp_%@", type.identifier, sourceIdentifier)
+                let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
+                if type == steptype {
+                    setSourceForStep(sourceIdentifier)
+                }
+            } else {
+                key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
+            }
             userDefaults.set(dateToSave, forKey: key)
         }
     }
     
-    func lastRecordedDate(for type: HKSampleType) -> Date {
+    func lastRecordedDate(for type: HKSampleType, source: String? = nil) -> Date {
+        let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
+        if type == steptype && source == nil && stepSourcesCount > 0 {
+            return lastRecordedStepDate(for: type, sources: getStepSources()!)
+        }
+        
         let userDefaults = UserDefaults.standard
-        let key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
-        let date = userDefaults.object(forKey: key) as? Date ?? Date().addingTimeInterval(-1.0 * 10.0 * 60.0)// past 10 minutes
+        let key: String
+        if let sourceIdentifier = source  {
+            key = String(format: "LMHealthKit_%@_timestamp_%@", type.identifier, sourceIdentifier)
+        } else {
+            key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
+        }
+        
+        //for version compatibility
+        let date: Date
+        if type == steptype {
+            let dateExist = userDefaults.object(forKey: key) as? Date // ?? Date().pastTenMinutes
+            if dateExist == nil && source != nil {
+                let  newkey = String(format: "LMHealthKit_%@_timestamp", type.identifier)
+                date = userDefaults.object(forKey: newkey) as? Date ?? Date().addingTimeInterval(-1 * 1 * 24 * 60 * 60)
+            } else {
+                date = dateExist ?? Date().addingTimeInterval(-1 * 1 * 24 * 60 * 60)
+            }
+        } else { // default case
+            date = userDefaults.object(forKey: key) as? Date ?? Date().pastTenMinutes
+        }
+        
+        //if saved date is too old, then return 1 day old timestamp
+        if date < Date().addingTimeInterval(-1 * 6 * 24 * 60 * 60) {
+            //if there is a source identifier, and more than 1, then remove it. Currently applied for steps only
+            if let sourceIdentifier = source, stepSourcesCount > 0 {
+                //cleaning the source
+                removeStepSource(sourceIdentifier)
+                userDefaults.removeObject(forKey: key)
+            }
+            return Date().pastDay
+        }
         return date
+    }
+    
+    func lastRecordedStepDate(for type: HKSampleType, sources: [String]) -> Date {
+        let dates = sources.map({lastRecordedDate(for: type, source: $0)})
+        let dateMinSaved = dates.min() ?? Date().pastTenMinutes
+        //suppose, at first login, if user used device stpes, and then synced wearable steps, but the wearable enddata might be less than the last saved device's endtime.
+        return [Date().pastDay, dateMinSaved].min() ?? Date().pastDay
+    }
+    
+    func setSourceForStep(_ source: String) {
+        let userDefaults = UserDefaults.standard
+        let key: String = "step_sources"
+        if var sources = userDefaults.object(forKey: key) as? [String] {
+            if sources.contains(source) == false {
+                sources.append(source)
+                userDefaults.set(sources, forKey: key)
+            }
+        } else {
+            userDefaults.set([source], forKey: key)
+        }
+    }
+    
+    func removeStepSource(_ source: String) {
+        let userDefaults = UserDefaults.standard
+        let key: String = "step_sources"
+        if let sources = userDefaults.object(forKey: key) as? [String] {
+           let excludedArray = sources.filter({$0 != source})
+           userDefaults.set(excludedArray, forKey: key)
+        }
+    }
+    
+    var stepSourcesCount: Int {
+        return getStepSources()?.count ?? 0
+    }
+    
+    func getStepSources() -> [String]? {
+        return UserDefaults.standard.value(forKey: "step_sources") as? [String]
+    }
+}
+
+extension Date {
+    var pastTenMinutes: Date {
+        return addingTimeInterval(-1.0 * 10.0 * 60.0)// past 10 minutes
+    }
+    var pastDay: Date {
+        return addingTimeInterval(-1 * 1 * 24 * 60 * 60)
     }
 }
 
@@ -203,9 +292,9 @@ extension LMHealthKitSensor {
     public func fetchHealthData() {
         //clearDataArrays()
         //stepcount
-        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.stepCount.lampIdentifier) == true {
-            getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
-        }
+//        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.stepCount.lampIdentifier) == true {
+//            getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
+//        }
         
         let quantityTypes = healthQuantityTypes
         for type in quantityTypes {
@@ -320,42 +409,42 @@ extension LMHealthKitSensor {
     //        }
     //    }
     
-    private func getStatisticalData(for typeIdent: HKQuantityTypeIdentifier) {
-        
-        guard let quntityType = HKObjectType.quantityType(forIdentifier: typeIdent) else { return }
-        let loginTime = Utils.shared.getHealthKitLaunchedTimestamp()
-        let predicate = HKQuery.predicateForSamples(withStart: loginTime, end: Date(), options: .strictEndDate)
-        // you can combine a cumulative option and seperated by source
-        let cumulativeQuery = HKStatisticsQuery(quantityType: quntityType, quantitySamplePredicate: predicate, options: ([.cumulativeSum, .separateBySource])) { query, statistics, error in
-            
-            guard let statistics = statistics else { return }
-            guard let type = query.objectType as? HKSampleType else { return }
-            // ... process the results here
-            var arrData = [LMHealthKitQuantityData]()
-            
-            if let sources = statistics.sources {
-                
-                let data = sources.map({ LMHealthKitQuantityData(statistics, source: $0) })
-                arrData.append(contentsOf: data)
-                
-            } else {
-                let data = LMHealthKitQuantityData(statistics, source: nil)
-                arrData.append(data)
-            }
-            
-            if self.healthQuantityTypes.contains(type) {
-                self.arrQuantityData.append(contentsOf: arrData)
-            }
-        }
-        healthStore.execute(cumulativeQuery)
-    }
+//    private func getStatisticalData(for typeIdent: HKQuantityTypeIdentifier) {
+//
+//        guard let quntityType = HKObjectType.quantityType(forIdentifier: typeIdent) else { return }
+//        let loginTime = Utils.shared.getHealthKitLaunchedTimestamp()
+//        let predicate = HKQuery.predicateForSamples(withStart: loginTime, end: Date(), options: .strictEndDate)
+//        // you can combine a cumulative option and seperated by source
+//        let cumulativeQuery = HKStatisticsQuery(quantityType: quntityType, quantitySamplePredicate: predicate, options: ([.cumulativeSum, .separateBySource])) { query, statistics, error in
+//
+//            guard let statistics = statistics else { return }
+//            guard let type = query.objectType as? HKSampleType else { return }
+//            // ... process the results here
+//            var arrData = [LMHealthKitQuantityData]()
+//
+//            if let sources = statistics.sources {
+//
+//                let data = sources.map({ LMHealthKitQuantityData(statistics, source: $0) })
+//                arrData.append(contentsOf: data)
+//
+//            } else {
+//                let data = LMHealthKitQuantityData(statistics, source: nil)
+//                arrData.append(data)
+//            }
+//
+//            if self.healthQuantityTypes.contains(type) {
+//                self.arrQuantityData.append(contentsOf: arrData)
+//            }
+//        }
+//        healthStore.execute(cumulativeQuery)
+//    }
     
     private func healthKitData(for type: HKSampleType, from start: Date) {
 
-        let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
-        if type == steptype {
-            return
-        }
+//        let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
+//        if type == steptype {
+//            return
+//        }
         
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
       
@@ -371,13 +460,17 @@ extension LMHealthKitSensor {
                 return
             }
             if let samples = sampleObjects as? [HKQuantitySample] {
-                
+                let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
+                if type == steptype {
+                    print("query start date = \(start)")
+                }
                 self?.saveQuantityData(samples, for: type)
                 let lastDate = samples.last?.endDate.addingTimeInterval(1)
-                self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
+                if type != steptype {
+                    self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
+                }
+                //for steptype, the date has been saved inside the saveQuantityData()
             } else if let samples = sampleObjects as? [HKCategorySample] {
-                
-                print("samples cnt = \(samples.count)")
                 self?.saveCategoryData(samples, for: type)
                 let lastDate = samples.last?.endDate.addingTimeInterval(1)
                 self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
@@ -427,7 +520,20 @@ extension LMHealthKitSensor {
             if let meta = sample.metadata {
                 data.metadata = meta
             }
-            arrData.append(data)
+            //get last timestamp of this identifier. if the sample.endDate is greater than timestamp then we can add it. And update last saved timestamp.
+            let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
+            if steptype == type {
+                print("start =\(sample.startDate), end =\(sample.endDate), steps =\(sample.quantity)")
+                let savedTimestamp = lastRecordedDate(for: type, source: data.source)
+                print("savedTimestamp = \(savedTimestamp)")
+                if sample.endDate > savedTimestamp {
+                    print("\n added")
+                    arrData.append(data)
+                    self.saveLastRecordedDate(sample.endDate, fetchedTime: Date(), for: type, source: data.source)
+                }
+            } else { //default case
+                arrData.append(data)
+            }
         }
         if healthQuantityTypes.contains(type) {
             arrQuantityData.append(contentsOf: arrData)
