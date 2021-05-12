@@ -167,7 +167,7 @@ private extension LMHealthKitSensor {
     func saveLastRecordedDate(_ date: Date?, fetchedTime: Date, for type: HKSampleType, source: String? = nil) {
         if let endDate = date {
             //Suppose the endDate is greater than 'now' then save 'now'. This is to fix if overlapping data from different sources. example to get sleep duration which reside in between bed time duration
-            let dateToSave = endDate > fetchedTime ? fetchedTime : endDate
+            let dateToSave = min(endDate, fetchedTime) //endDate > fetchedTime ? fetchedTime : endDate
             let userDefaults = UserDefaults.standard
             let key: String
             if let sourceIdentifier = source  {
@@ -529,7 +529,8 @@ extension LMHealthKitSensor {
                 if sample.endDate > savedTimestamp {
                     print("\n added")
                     arrData.append(data)
-                    self.saveLastRecordedDate(sample.endDate, fetchedTime: Date(), for: type, source: data.source)
+                    // we are passing startdate to get if there are multipe entries.
+                    self.saveLastRecordedDate(sample.startDate, fetchedTime: Date(), for: type, source: data.source)
                 }
             } else { //default case
                 arrData.append(data)

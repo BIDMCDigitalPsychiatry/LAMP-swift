@@ -41,7 +41,13 @@ public class MotionManager: ISensorController {
     public class Config: SensorConfig {
         
         public var period: Double  = 1 // min
-        public var frequency: Int = 5 // Hz
+        
+        var activeFrequency: Double = 5
+        public var frequency: Double = 1 { // Hz
+            didSet {
+                activeFrequency = min(frequency, 100.0)
+            }
+        }
         /**
          * Accelerometer threshold (Double).  Do not record consecutive points if
          * change in value of all axes is less than this.
@@ -70,7 +76,7 @@ public class MotionManager: ISensorController {
                 self.threshold = threshold
             }
             
-            if let frequency = config["frequency"] as? Int {
+            if let frequency = config["frequency"] as? Double {
                 self.frequency = frequency
             }
         }
@@ -84,6 +90,7 @@ public class MotionManager: ISensorController {
     
     public convenience init() {
         self.init(MotionManager.Config())
+        print("init motion")
     }
 
     deinit {
@@ -125,6 +132,7 @@ public class MotionManager: ISensorController {
     public func start() {
         self.shouldRestartMotionUpdates = true
         self.restartMotionUpdates()
+        print("starting motion")
         // Configure a timer to fetch the data.
 //        self.motionUpdateTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / Double(CONFIG.frequency), repeats: true, block: { (timer1) in
 //            // Get the motion data.
@@ -161,12 +169,13 @@ public class MotionManager: ISensorController {
     public func restartMotionUpdates() {
         guard self.shouldRestartMotionUpdates else { return }
         
-        self.motionManager.accelerometerUpdateInterval = 1.0 / Double (config.frequency)
-        self.motionManager.gyroUpdateInterval = 1.0 / Double (config.frequency)
-        self.motionManager.magnetometerUpdateInterval = 1.0 / Double (config.frequency)
-        self.motionManager.deviceMotionUpdateInterval = 1.0 / Double (config.frequency)
+        self.motionManager.accelerometerUpdateInterval = 1.0 / Double (config.activeFrequency)
+        self.motionManager.gyroUpdateInterval = 1.0 / Double (config.activeFrequency)
+        self.motionManager.magnetometerUpdateInterval = 1.0 / Double (config.activeFrequency)
+        self.motionManager.deviceMotionUpdateInterval = 1.0 / Double (config.activeFrequency)
         
         stopUpdates()
+        print("fire secods = \(Double(self.config.activeFrequency) * self.config.sensorTimerDataStoreInterval)")
         startUpdates()
     }
     
@@ -188,7 +197,8 @@ public class MotionManager: ISensorController {
                         self.config.accelerometerObserver?.onDataChanged(data: AccelerometerData(dataAcc.acceleration))
                     }
                     self.runCount += 1
-                    if self.runCount > Double(self.config.frequency) * self.config.sensorTimerDataStoreInterval {
+                    print("runCount = \(self.runCount)")
+                    if self.runCount > Double(self.config.activeFrequency) * self.config.sensorTimerDataStoreInterval {
                         self.config.sensorTimerDelegate?.timeToStore()
                         self.runCount = 0
                     }
@@ -223,7 +233,7 @@ public class MotionManager: ISensorController {
                 }
                 
                 self.runCount += 1
-                if self.runCount > Double(self.config.frequency) * self.config.sensorTimerDataStoreInterval {
+                if self.runCount > Double(self.config.activeFrequency) * self.config.sensorTimerDataStoreInterval {
                     self.config.sensorTimerDelegate?.timeToStore()
                     self.runCount = 0
                 }

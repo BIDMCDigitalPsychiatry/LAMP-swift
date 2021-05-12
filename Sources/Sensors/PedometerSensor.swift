@@ -58,7 +58,7 @@ public class PedometerSensor: ISensorController {
     }
     
     public func start() {
-
+        print("starting pedo")
         if !CMPedometer.isPaceAvailable(){
             print(PedometerSensor.TAG, "Pace is not available.")
         }

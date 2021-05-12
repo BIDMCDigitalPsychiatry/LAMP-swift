@@ -1,5 +1,7 @@
 #if !os(watchOS)
 
+import Reachability
+
 import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 
@@ -21,6 +23,7 @@ public protocol WiFiObserver: class {
 
 public class WiFiSensor: ISensorController {
 
+    public var identifier = "WiFiSensor"
     public var config = Config()
     let reachability: Reachability
 

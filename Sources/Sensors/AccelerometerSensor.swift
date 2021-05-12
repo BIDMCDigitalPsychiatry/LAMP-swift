@@ -28,7 +28,12 @@ public class AccelerometerSensor: ISensorController {
     public class Config: SensorConfig {
         
         public var period: Double  = 1 // second
-        public var frequency: Int = 5 // Hz
+        var activeFrequency: Double = 5
+        public var frequency: Double = 5 { // Hz
+            didSet {
+                activeFrequency = min(frequency, 100.0)
+            }
+        }
         /**
          * Accelerometer threshold (Double).  Do not record consecutive points if
          * change in value of all axes is less than this.
@@ -50,7 +55,7 @@ public class AccelerometerSensor: ISensorController {
                 self.threshold = threshold
             }
             
-            if let frequency = config["frequency"] as? Int {
+            if let frequency = config["frequency"] as? Double {
                 self.frequency = frequency
             }
         }
@@ -80,7 +85,7 @@ public class AccelerometerSensor: ISensorController {
                 self.config.sensorObserver?.onDataChanged(data: AccelerometerData(data.acceleration))
             }
             
-            motionManager.accelerometerUpdateInterval = 1.0 / Double(config.frequency)
+            motionManager.accelerometerUpdateInterval = 1.0 / config.activeFrequency
             motionManager.startAccelerometerUpdates(to: opQueue, withHandler: handler)
         }
     }

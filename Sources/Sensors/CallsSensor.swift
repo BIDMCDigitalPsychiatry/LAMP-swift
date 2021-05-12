@@ -33,7 +33,6 @@ public protocol CallsObserver: class {
 
 public class CallsSensor: NSObject, ISensorController {
 
-    
     public enum CallEventType: Int {
         case incoming  = 1
         case outgoing  = 2

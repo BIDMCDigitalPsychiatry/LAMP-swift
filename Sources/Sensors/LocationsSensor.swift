@@ -17,6 +17,7 @@ public enum LocationErrorType {
 
 public class LocationsSensor: NSObject, ISensorController {
 
+    var timer: Timer?
     public let locationManager = CLLocationManager()
     
     public var config: LocationsSensor.Config
@@ -29,7 +30,15 @@ public class LocationsSensor: NSObject, ISensorController {
         public weak var locationDataObserver: LocationsDataObserver?
         //public var geoFences: String? = nil; // TODO: convert the value to CLRegion
         public var statusGps = true
-        public var minimumInterval = 0.0//in seconds
+        public var minimumInterval: Double {
+            return 1.0 / activeFrequency
+        }
+        var activeFrequency: Double = 1
+        public var frequency: Double = 1 { // Hz
+            didSet {
+                activeFrequency = min(frequency, 100.0)
+            }
+        }
         
         public var accuracy: CLLocationAccuracy = kCLLocationAccuracyBestForNavigation
 
@@ -61,7 +70,7 @@ public class LocationsSensor: NSObject, ISensorController {
     }
     
     public func start() {
-        
+        print("Staring location")
         // Do not start services that aren't available.
         if false == CLLocationManager.locationServicesEnabled() {
             // Location services is not available.
@@ -95,6 +104,7 @@ public class LocationsSensor: NSObject, ISensorController {
 
     }
     
+    let queue = DispatchQueue(label: "LocationSensor", qos: .background, attributes: .concurrent)
     func startLocationServices() {
         #if os(iOS)
         locationManager.pausesLocationUpdatesAutomatically = false
@@ -113,6 +123,28 @@ public class LocationsSensor: NSObject, ISensorController {
             #endif
         }
 
+        queue.async {
+            let currentRunLoop = RunLoop.current
+            self.timer = Timer.scheduledTimer(timeInterval: self.config.minimumInterval, target: self, selector: #selector(self.fetchLocation), userInfo: nil, repeats: true)
+            currentRunLoop.add(self.timer!, forMode: .common)
+            currentRunLoop.run()
+        }
+    }
+    
+    @objc
+    func fetchLocation() {
+        if self.config.statusGps {
+            //locationManager.requestLocation()
+            guard let newestLocation = locationManager.location else {
+                locationManager.requestLocation()
+                return
+            }
+            let timestamp = Date()
+            let locationStamp = timestamp.timeIntervalSince1970
+            if (locationStamp - lastStoredTime) >= config.minimumInterval {
+                self.config.locationDataObserver?.onLocationChanged(data: LocationsData(newestLocation, eventTime: timestamp))
+            }
+        }
     }
     
     func stopLocationServices(){
@@ -121,6 +153,8 @@ public class LocationsSensor: NSObject, ISensorController {
             #if os(iOS)
             locationManager.stopMonitoringSignificantLocationChanges()
             #endif
+            timer?.invalidate()
+            timer = nil
         }
     }
 }
@@ -150,7 +184,6 @@ extension LocationsSensor: CLLocationManagerDelegate {
         let sortedLocations = locations.sorted { (l1, l2) -> Bool in
             return l1.timestamp.compare(l2.timestamp) != .orderedDescending
         }
-
         if let newestLocation = sortedLocations.last {
 
             if (newestLocation.horizontalAccuracy < 0) {
