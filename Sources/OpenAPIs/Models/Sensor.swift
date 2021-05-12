@@ -10,6 +10,14 @@ import Foundation
 
 /** A sensor that may or may not be available on a physical device. */
 public struct Sensor: Codable {
+    
+    /*
+     For now, an alternate solution is to auto-enable cellular_upload for ALL sensors if AT LEAST ONE sensor has it enabled
+     */
+    public struct Settings: Codable {
+        public var frequency: Double?
+        public var cellular_upload: Bool?
+    }
 
     /** A globally unique reference for objects. */
     public var id: String?
@@ -18,9 +26,9 @@ public struct Sensor: Codable {
     /** The name of the sensor. */
     public var name: String?
     /** The configuration settings for the sensor. */
-    public var settings: AnyCodable?
+    public var settings: Settings?
 
-    public init(id: String? = nil, spec: String? = nil, name: String? = nil, settings: AnyCodable? = nil) {
+    public init(id: String? = nil, spec: String? = nil, name: String? = nil, settings: Settings? = nil) {
         self.id = id
         self.spec = spec
         self.name = name

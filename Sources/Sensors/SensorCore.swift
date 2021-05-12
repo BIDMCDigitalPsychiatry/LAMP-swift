@@ -6,7 +6,7 @@ protocol TextPresentation {
 
 
 public protocol ISensorController {
-    var  id: String {get}
+    var id: String {get}
     func start()
     func stop()
     var notificationCenter: NotificationCenter {get}
