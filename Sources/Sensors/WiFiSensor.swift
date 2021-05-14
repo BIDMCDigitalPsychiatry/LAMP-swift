@@ -1,7 +1,5 @@
 #if !os(watchOS)
 
-import Reachability
-
 import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 
@@ -101,7 +99,7 @@ public class WiFiSensor: ISensorController {
                     }
                     
                     break
-                case .cellular, .none:
+                case .cellular:
                     if let observer = self.config.sensorObserver {
                         observer.onWiFiDisabled()
                     }
