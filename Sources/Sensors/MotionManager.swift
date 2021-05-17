@@ -199,8 +199,8 @@ public class MotionManager: ISensorController {
                     self.runCount += 1
                     print("runCount = \(self.runCount)")
                     if self.runCount > Double(self.config.activeFrequency) * self.config.sensorTimerDataStoreInterval {
-                        self.config.sensorTimerDelegate?.timeToStore()
                         self.runCount = 0
+                        self.config.sensorTimerDelegate?.timeToStore()
                     }
                 }
             }
@@ -234,8 +234,8 @@ public class MotionManager: ISensorController {
                 
                 self.runCount += 1
                 if self.runCount > Double(self.config.activeFrequency) * self.config.sensorTimerDataStoreInterval {
-                    self.config.sensorTimerDelegate?.timeToStore()
                     self.runCount = 0
+                    self.config.sensorTimerDelegate?.timeToStore()
                 }
             }
         }
