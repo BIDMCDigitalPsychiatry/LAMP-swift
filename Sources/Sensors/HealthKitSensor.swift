@@ -23,6 +23,8 @@ public class LMHealthKitSensor: ISensorController {
     private var arrCharacteristicData = [LMHealthKitCharacteristicData]()
     //HKWorkoutData
     private var arrWorkoutData = [LMHealthKitWorkoutData]()
+    // we are using last sample's start time to fetch next set, to ignore duplicate steps we are caching the last set of records
+    var cachedSteps: [UUID]?
     
     public init(_ sensorsToCollect: [String]? = nil) {
         self.sensorsToCollect = sensorsToCollect
@@ -75,11 +77,11 @@ public class LMHealthKitSensor: ISensorController {
         if sensorsToCollect?.contains(HKQuantityTypeIdentifier.dietaryIron.lampIdentifier) == true {
             identifiers.append(contentsOf: nutritionTypes)//, .uvExposure])
         }
-
-//        identifiers.append(.appleStandTime)
-//        identifiers.append(.environmentalAudioExposure)
-//        identifiers.append(.headphoneAudioExposure)
-
+        
+        //        identifiers.append(.appleStandTime)
+        //        identifiers.append(.environmentalAudioExposure)
+        //        identifiers.append(.headphoneAudioExposure)
+        
         for identifier in identifiers {
             if let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) {
                 quantityTypes.append(quantityType)
@@ -107,13 +109,13 @@ public class LMHealthKitSensor: ISensorController {
     }()
     
     lazy var healthCharacteristicTypes: [HKObjectType] = {
-//        var characteristicTypes = [HKObjectType]()
-//        var identifiers: [HKCharacteristicTypeIdentifier] = [HKCharacteristicTypeIdentifier.biologicalSex, HKCharacteristicTypeIdentifier.bloodType, HKCharacteristicTypeIdentifier.dateOfBirth, HKCharacteristicTypeIdentifier.fitzpatrickSkinType, HKCharacteristicTypeIdentifier.wheelchairUse]
-//        for identifier in identifiers {
-//            if let coreRelationType = HKCorrelationType.characteristicType(forIdentifier: identifier) {
-//                characteristicTypes.append(coreRelationType)
-//            }
-//        }
+        //        var characteristicTypes = [HKObjectType]()
+        //        var identifiers: [HKCharacteristicTypeIdentifier] = [HKCharacteristicTypeIdentifier.biologicalSex, HKCharacteristicTypeIdentifier.bloodType, HKCharacteristicTypeIdentifier.dateOfBirth, HKCharacteristicTypeIdentifier.fitzpatrickSkinType, HKCharacteristicTypeIdentifier.wheelchairUse]
+        //        for identifier in identifiers {
+        //            if let coreRelationType = HKCorrelationType.characteristicType(forIdentifier: identifier) {
+        //                characteristicTypes.append(coreRelationType)
+        //            }
+        //        }
         return []
     }()
     
@@ -196,7 +198,7 @@ private extension LMHealthKitSensor {
         } else {
             key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
         }
-
+        
         let date: Date
         if type == steptype {
             if let dateExist = userDefaults.object(forKey: key) as? Date {
@@ -257,8 +259,8 @@ private extension LMHealthKitSensor {
         let userDefaults = UserDefaults.standard
         let key: String = "step_sources"
         if let sources = userDefaults.object(forKey: key) as? [String] {
-           let excludedArray = sources.filter({$0 != source})
-           userDefaults.set(excludedArray, forKey: key)
+            let excludedArray = sources.filter({$0 != source})
+            userDefaults.set(excludedArray, forKey: key)
         }
     }
     
@@ -301,9 +303,9 @@ extension LMHealthKitSensor {
     public func fetchHealthData() {
         //clearDataArrays()
         //stepcount
-//        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.stepCount.lampIdentifier) == true {
-//            getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
-//        }
+        //        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.stepCount.lampIdentifier) == true {
+        //            getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
+        //        }
         
         let quantityTypes = healthQuantityTypes
         for type in quantityTypes {
@@ -418,54 +420,54 @@ extension LMHealthKitSensor {
     //        }
     //    }
     
-//    private func getStatisticalData(for typeIdent: HKQuantityTypeIdentifier) {
-//
-//        guard let quntityType = HKObjectType.quantityType(forIdentifier: typeIdent) else { return }
-//        let loginTime = Utils.shared.getHealthKitLaunchedTimestamp()
-//        let predicate = HKQuery.predicateForSamples(withStart: loginTime, end: Date(), options: .strictEndDate)
-//        // you can combine a cumulative option and seperated by source
-//        let cumulativeQuery = HKStatisticsQuery(quantityType: quntityType, quantitySamplePredicate: predicate, options: ([.cumulativeSum, .separateBySource])) { query, statistics, error in
-//
-//            guard let statistics = statistics else { return }
-//            guard let type = query.objectType as? HKSampleType else { return }
-//            // ... process the results here
-//            var arrData = [LMHealthKitQuantityData]()
-//
-//            if let sources = statistics.sources {
-//
-//                let data = sources.map({ LMHealthKitQuantityData(statistics, source: $0) })
-//                arrData.append(contentsOf: data)
-//
-//            } else {
-//                let data = LMHealthKitQuantityData(statistics, source: nil)
-//                arrData.append(data)
-//            }
-//
-//            if self.healthQuantityTypes.contains(type) {
-//                self.arrQuantityData.append(contentsOf: arrData)
-//            }
-//        }
-//        healthStore.execute(cumulativeQuery)
-//    }
+    //    private func getStatisticalData(for typeIdent: HKQuantityTypeIdentifier) {
+    //
+    //        guard let quntityType = HKObjectType.quantityType(forIdentifier: typeIdent) else { return }
+    //        let loginTime = Utils.shared.getHealthKitLaunchedTimestamp()
+    //        let predicate = HKQuery.predicateForSamples(withStart: loginTime, end: Date(), options: .strictEndDate)
+    //        // you can combine a cumulative option and seperated by source
+    //        let cumulativeQuery = HKStatisticsQuery(quantityType: quntityType, quantitySamplePredicate: predicate, options: ([.cumulativeSum, .separateBySource])) { query, statistics, error in
+    //
+    //            guard let statistics = statistics else { return }
+    //            guard let type = query.objectType as? HKSampleType else { return }
+    //            // ... process the results here
+    //            var arrData = [LMHealthKitQuantityData]()
+    //
+    //            if let sources = statistics.sources {
+    //
+    //                let data = sources.map({ LMHealthKitQuantityData(statistics, source: $0) })
+    //                arrData.append(contentsOf: data)
+    //
+    //            } else {
+    //                let data = LMHealthKitQuantityData(statistics, source: nil)
+    //                arrData.append(data)
+    //            }
+    //
+    //            if self.healthQuantityTypes.contains(type) {
+    //                self.arrQuantityData.append(contentsOf: arrData)
+    //            }
+    //        }
+    //        healthStore.execute(cumulativeQuery)
+    //    }
     
     private func healthKitData(for type: HKSampleType, from start: Date) {
-
+        
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
-      
+        
         let today = Date()
         let predicate = HKQuery.predicateForSamples(withStart: start, end: today, options: HKQueryOptions.strictStartDate)
-
+        
         let quantityQuery = HKSampleQuery(sampleType: type, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { [weak self] (query, sampleObjects, error) in
-
+            
             guard let type = query.objectType as? HKSampleType else { return }
-
+            
             if error != nil {
                 self?.observer?.onHKDataFetch(for: type.identifier, error: error)
                 return
             }
             if let samples = sampleObjects as? [HKQuantitySample], samples.count > 0 {
                 let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
-
+                
                 self?.saveQuantityData(samples, for: type)
                 let lastDate = samples.last?.endDate.addingTimeInterval(1)
                 if type != steptype {
@@ -488,7 +490,7 @@ extension LMHealthKitSensor {
     
     
     private func saveQuantityData(_ samples: [HKQuantitySample], for type: HKSampleType) {
-        
+        let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
         var arrData = [LMHealthKitQuantityData]()
         for sample in samples {
             let typeIdentifier = HKQuantityTypeIdentifier(rawValue: sample.quantityType.identifier)
@@ -523,17 +525,24 @@ extension LMHealthKitSensor {
                 data.metadata = meta
             }
             //get last timestamp of this identifier. if the sample.endDate is greater than timestamp then we can add it. And update last saved timestamp.
-            let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
             if steptype == type {
+                if true == cachedSteps?.contains(sample.uuid) {
+                    continue
+                }
+                arrData.append(data)
+                
                 let savedTimestamp = lastRecordedDate(for: type, source: data.source)
-                if sample.endDate > savedTimestamp {
-                    arrData.append(data)
+                if sample.startDate > savedTimestamp {
                     // we are passing startdate to get if there are multipe entries.
                     self.saveLastRecordedDate(sample.startDate, fetchedTime: Date(), for: type, source: data.source)
                 }
             } else { //default case
                 arrData.append(data)
             }
+        }
+        //reset cached data
+        if steptype == type {
+            cachedSteps = samples.map({ $0.uuid })
         }
         if healthQuantityTypes.contains(type) {
             arrQuantityData.append(contentsOf: arrData)
