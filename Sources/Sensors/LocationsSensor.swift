@@ -100,7 +100,6 @@ public class LocationsSensor: NSObject, ISensorController {
         @unknown default:
             break
         }
-        
         self.startLocationServices()
         
     }
@@ -123,8 +122,10 @@ public class LocationsSensor: NSObject, ISensorController {
         // locationManager.activityType = CLActivityType.other
         
         if self.config.statusGps {
+            locationManager.stopUpdatingLocation()
             locationManager.startUpdatingLocation()
             #if os(iOS)
+            locationManager.stopMonitoringSignificantLocationChanges()
             locationManager.startMonitoringSignificantLocationChanges()
             #endif
         }
@@ -132,6 +133,8 @@ public class LocationsSensor: NSObject, ISensorController {
         if config.activeFrequency != nil && config.minimumInterval > 0 {
             queue.async {
                 let currentRunLoop = RunLoop.current
+                self.timer?.invalidate()
+                self.timer = nil
                 self.timer = Timer.scheduledTimer(timeInterval: self.config.minimumInterval, target: self, selector: #selector(self.fetchLocation), userInfo: nil, repeats: true)
                 currentRunLoop.add(self.timer!, forMode: .common)
                 currentRunLoop.run()
@@ -155,7 +158,7 @@ public class LocationsSensor: NSObject, ISensorController {
         }
     }
     
-    func stopLocationServices(){
+    func stopLocationServices() {
         if self.config.statusGps {
             locationManager.stopUpdatingLocation()
             #if os(iOS)
@@ -199,7 +202,7 @@ extension LocationsSensor: CLLocationManagerDelegate {
             }
             if abs(newestLocation.timestamp.timeIntervalSinceNow) < 60 {
                 let locationStamp = newestLocation.timestamp.timeIntervalSince1970
-                if (locationStamp - lastStoredTime) > config.minimumInterval || lastLocation?.isNotSameLocation(of: newestLocation) == true {
+                 if (locationStamp - lastStoredTime) > config.minimumInterval || lastLocation?.isNotSameLocation(of: newestLocation) == true {
                     lastStoredTime = locationStamp
                     lastLocation = newestLocation
                     dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
