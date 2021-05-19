@@ -16,10 +16,15 @@ public enum LocationErrorType {
 
 
 public class LocationsSensor: NSObject, ISensorController {
-
-    var timer: Timer?
-    public let locationManager = CLLocationManager()
     
+    var timer: Timer?
+//    public let locationManager = CLLocationManager()
+    public lazy var locationManager: CLLocationManager = {
+        let manager = CLLocationManager()
+        manager.delegate = self
+        return manager
+    }()
+    var lastLocation: CLLocation?
     public var config: LocationsSensor.Config
     
     private var lastStoredTime: TimeInterval = Date().timeIntervalSince1970.advanced(by: -4 * 60)
@@ -30,18 +35,20 @@ public class LocationsSensor: NSObject, ISensorController {
         public weak var locationDataObserver: LocationsDataObserver?
         //public var geoFences: String? = nil; // TODO: convert the value to CLRegion
         public var statusGps = true
-        public var minimumInterval: Double {
-            return 1.0 / activeFrequency
+        var minimumInterval: Double {
+            guard let frquecySetByUser = activeFrequency, frquecySetByUser > 0.0 else { return 1 }
+            return 1.0 / frquecySetByUser
         }
-        var activeFrequency: Double = 1
-        public var frequency: Double = 1 { // Hz
+        var activeFrequency: Double?
+        public var frequency: Double? = nil { // Hz
             didSet {
-                activeFrequency = min(frequency, 100.0)
+                guard let frquenctValue = frequency else { return }
+                activeFrequency = min(frquenctValue, 100.0)
             }
         }
         
         public var accuracy: CLLocationAccuracy = kCLLocationAccuracyBestForNavigation
-
+        
         public override init() {
             super.init()
         }
@@ -63,14 +70,13 @@ public class LocationsSensor: NSObject, ISensorController {
         self.init(LocationsSensor.Config())
     }
     
-    public init(_ config:LocationsSensor.Config){
+    public init(_ config: LocationsSensor.Config){
         self.config = config
         super.init()
-        self.locationManager.delegate = self;
+        self.locationManager.delegate = self
     }
     
     public func start() {
-        print("Staring location")
         // Do not start services that aren't available.
         if false == CLLocationManager.locationServicesEnabled() {
             // Location services is not available.
@@ -88,20 +94,20 @@ public class LocationsSensor: NSObject, ISensorController {
             return
         case .authorizedWhenInUse:
             locationManager.requestAlwaysAuthorization()
+            locationManager.requestLocation()
         case .authorizedAlways:
-            break
+            locationManager.requestLocation()
         @unknown default:
             break
         }
-
+        
         self.startLocationServices()
-
+        
     }
-    
     
     public func stop() {
         self.stopLocationServices()
-
+        
     }
     
     let queue = DispatchQueue(label: "LocationSensor", qos: .background, attributes: .concurrent)
@@ -115,26 +121,27 @@ public class LocationsSensor: NSObject, ISensorController {
         // locationManager.distanceFilter = CONFIG.minGpsAccuracy // In meters.
         // Configure and start the service.
         // locationManager.activityType = CLActivityType.other
-
+        
         if self.config.statusGps {
             locationManager.startUpdatingLocation()
             #if os(iOS)
             locationManager.startMonitoringSignificantLocationChanges()
             #endif
         }
-
-        queue.async {
-            let currentRunLoop = RunLoop.current
-            self.timer = Timer.scheduledTimer(timeInterval: self.config.minimumInterval, target: self, selector: #selector(self.fetchLocation), userInfo: nil, repeats: true)
-            currentRunLoop.add(self.timer!, forMode: .common)
-            currentRunLoop.run()
+        
+        if config.activeFrequency != nil && config.minimumInterval > 0 {
+            queue.async {
+                let currentRunLoop = RunLoop.current
+                self.timer = Timer.scheduledTimer(timeInterval: self.config.minimumInterval, target: self, selector: #selector(self.fetchLocation), userInfo: nil, repeats: true)
+                currentRunLoop.add(self.timer!, forMode: .common)
+                currentRunLoop.run()
+            }
         }
     }
     
     @objc
     func fetchLocation() {
         if self.config.statusGps {
-            //locationManager.requestLocation()
             guard let newestLocation = locationManager.location else {
                 locationManager.requestLocation()
                 return
@@ -160,7 +167,7 @@ public class LocationsSensor: NSObject, ISensorController {
 }
 
 extension LocationsSensor: CLLocationManagerDelegate {
-
+    
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if self.config.debug { print(#function) }
         switch status {
@@ -185,26 +192,28 @@ extension LocationsSensor: CLLocationManagerDelegate {
             return l1.timestamp.compare(l2.timestamp) != .orderedDescending
         }
         if let newestLocation = sortedLocations.last {
-
+            
             if (newestLocation.horizontalAccuracy < 0) {
                 return
             }
             if abs(newestLocation.timestamp.timeIntervalSinceNow) < 60 {
                 let locationStamp = newestLocation.timestamp.timeIntervalSince1970
-                if (locationStamp - lastStoredTime) > config.minimumInterval {
-                    //self.saveLocations(newestLocation, eventTime: newestLocation.timestamp)
+                if (locationStamp - lastStoredTime) > config.minimumInterval || lastLocation?.isNotSameLocation(of: newestLocation) == true {
                     dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
                     lastStoredTime = locationStamp
                 }
             }
         }
     }
-
+    
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        //let msg = String(format: Logs.Messages.location_error, error.localizedDescription)
         config.sensorObserver?.onError(LocationErrorType.otherErrors(error))
         if self.config.debug { print(error) }
     }
     
 }
-
+extension CLLocation {
+    func isNotSameLocation(of latest: CLLocation) -> Bool {
+        return coordinate.latitude != latest.coordinate.latitude || coordinate.longitude != latest.coordinate.longitude
+    }
+}
