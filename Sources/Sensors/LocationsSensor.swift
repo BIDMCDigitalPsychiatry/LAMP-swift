@@ -149,6 +149,7 @@ public class LocationsSensor: NSObject, ISensorController {
             let timestamp = Date()
             let locationStamp = timestamp.timeIntervalSince1970
             if (locationStamp - lastStoredTime) >= config.minimumInterval {
+                lastLocation = newestLocation
                 self.config.locationDataObserver?.onLocationChanged(data: LocationsData(newestLocation, eventTime: timestamp))
             }
         }
@@ -199,8 +200,9 @@ extension LocationsSensor: CLLocationManagerDelegate {
             if abs(newestLocation.timestamp.timeIntervalSinceNow) < 60 {
                 let locationStamp = newestLocation.timestamp.timeIntervalSince1970
                 if (locationStamp - lastStoredTime) > config.minimumInterval || lastLocation?.isNotSameLocation(of: newestLocation) == true {
-                    dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
                     lastStoredTime = locationStamp
+                    lastLocation = newestLocation
+                    dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
                 }
             }
         }
