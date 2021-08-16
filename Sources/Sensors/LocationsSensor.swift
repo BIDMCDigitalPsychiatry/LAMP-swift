@@ -18,7 +18,7 @@ public enum LocationErrorType {
 public class LocationsSensor: NSObject, ISensorController {
     
     var timer: Timer?
-//    public let locationManager = CLLocationManager()
+    //    public let locationManager = CLLocationManager()
     public lazy var locationManager: CLLocationManager = {
         let manager = CLLocationManager()
         manager.delegate = self
@@ -153,6 +153,7 @@ public class LocationsSensor: NSObject, ISensorController {
             let locationStamp = timestamp.timeIntervalSince1970
             if (locationStamp - lastStoredTime) >= config.minimumInterval {
                 lastLocation = newestLocation
+                lastStoredTime = locationStamp
                 self.config.locationDataObserver?.onLocationChanged(data: LocationsData(newestLocation, eventTime: timestamp))
             }
         }
@@ -202,11 +203,20 @@ extension LocationsSensor: CLLocationManagerDelegate {
             }
             if abs(newestLocation.timestamp.timeIntervalSinceNow) < 60 {
                 let locationStamp = newestLocation.timestamp.timeIntervalSince1970
-                 if (locationStamp - lastStoredTime) > config.minimumInterval || lastLocation?.isNotSameLocation(of: newestLocation) == true {
-                    lastStoredTime = locationStamp
-                    lastLocation = newestLocation
-                    dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
+                if config.minimumInterval > 1 {
+                    if (locationStamp - lastStoredTime) > config.minimumInterval {
+                        lastStoredTime = locationStamp
+                        lastLocation = newestLocation
+                        dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
+                    }
+                } else {
+                    if (locationStamp - lastStoredTime) > config.minimumInterval || lastLocation?.isNotSameLocation(of: newestLocation) == true {
+                        lastStoredTime = locationStamp
+                        lastLocation = newestLocation
+                        dataObserver.onLocationChanged(data: LocationsData(newestLocation, eventTime: newestLocation.timestamp) )
+                    }
                 }
+                
             }
         }
     }

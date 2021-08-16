@@ -21,9 +21,9 @@ public class MotionData {
     public var gravity: CMAcceleration
     public var deviceAttitude: DeviceAttitude
     
-    init(_ deviceMotion: CMDeviceMotion) {
+    init(_ deviceMotion: CMDeviceMotion, timeInterval: Double) {
         
-        timestamp = Date().timeIntervalSince1970 * 1000
+        timestamp = timeInterval * 1000
         self.acceleration = deviceMotion.userAcceleration
         self.rotationRate = deviceMotion.rotationRate
         self.magneticField = deviceMotion.magneticField.field//we can check accuracy here
@@ -32,12 +32,12 @@ public class MotionData {
     }
 }
 
-
 public class MotionSensor: ISensorController {
     
         /// config ///
     public var config = MotionSensor.Config()
-    
+    private var lastSavedTimeStamp: Double = 0.0
+    private var isCollecting = true
     private var motionManager: CMMotionManager
     private let opQueue: OperationQueue = {
         let o = OperationQueue()
@@ -47,7 +47,9 @@ public class MotionSensor: ISensorController {
     
     public class Config: SensorConfig {
         
-        public var period: Double  = 1 // min
+        public var collectionPeriod: Double = 0 // min
+        public var pausePeriod: Double  = 0 // min
+        
         var activeFrequency: Double = 5
         public var frequency: Double? = nil { // Hz
             didSet {
@@ -66,20 +68,20 @@ public class MotionSensor: ISensorController {
             super.init()
         }
         
-        public override func set(config: Dictionary<String, Any>) {
-            super.set(config: config)
-            if let period = config["period"] as? Double {
-                self.period = period
-            }
-            
-            if let threshold = config ["threshold"] as? Double {
-                self.threshold = threshold
-            }
-            
-            if let frequency = config["frequency"] as? Double {
-                self.frequency = frequency
-            }
-        }
+//        public override func set(config: Dictionary<String, Any>) {
+//            super.set(config: config)
+//            if let period = config["period"] as? Double {
+//                self.period = period
+//            }
+//
+//            if let threshold = config ["threshold"] as? Double {
+//                self.threshold = threshold
+//            }
+//
+//            if let frequency = config["frequency"] as? Double {
+//                self.frequency = frequency
+//            }
+//        }
         
         public func apply(closure: (_ config: MotionSensor.Config ) -> Void) -> Self {
             closure(self)
@@ -126,7 +128,37 @@ public class MotionSensor: ISensorController {
                 guard let data = data else {
                     return
                 }
-                self.config.sensorObserver?.onDataChanged(data: MotionData(data))
+                let currentTimeInterval = Date().timeIntervalSince1970
+                
+                if self.config.pausePeriod > 0 {
+                    if self.lastSavedTimeStamp < 1 {
+                        //("data collection started %@", Date())
+                        self.lastSavedTimeStamp = currentTimeInterval
+                    }
+                    // we should pause after 'collectionPeriod' minutes of data collection
+                    if self.isCollecting {
+                        if currentTimeInterval > self.lastSavedTimeStamp + (self.config.collectionPeriod * 60) {
+                            self.isCollecting = false
+                            self.lastSavedTimeStamp = currentTimeInterval
+                            //("data collection paused %@", Date())
+                            return
+                        } else {
+                            
+                        }
+                    }
+                    // we should resume after 'pausePeriod' minutes of idle
+                    else {
+                        if currentTimeInterval > self.lastSavedTimeStamp + (self.config.pausePeriod * 60) {
+                            self.isCollecting = true
+                            self.lastSavedTimeStamp = currentTimeInterval
+                            //("data collection resumed %@", Date())
+                        } else {
+                            return
+                        }
+                    }
+                }
+                
+                self.config.sensorObserver?.onDataChanged(data: MotionData(data, timeInterval: currentTimeInterval))
             }
             
             motionManager.deviceMotionUpdateInterval = 1.0/Double(config.activeFrequency)
@@ -161,7 +193,7 @@ public class MotionSensor: ISensorController {
         
     }
     
-    public init(_ config:MotionSensor.Config) {
+    public init(_ config: MotionSensor.Config) {
         self.config = config
         motionManager = CMMotionManager()
         if config.debug { print("Accelerometer sensor is created.") }
