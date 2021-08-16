@@ -29,7 +29,8 @@ public class MotionManager: ISensorController {
     
     /// config ///
     public var config = MotionManager.Config()
-    
+    private var lastSavedTimeStamp: Double = 0.0
+    private var isCollecting = true
     private var motionManager: CMMotionManager
     var motionUpdateTimer: Timer?
     private let opQueue: OperationQueue = {
@@ -40,7 +41,8 @@ public class MotionManager: ISensorController {
 
     public class Config: SensorConfig {
         
-        public var period: Double  = 1 // min
+        public var collectionPeriod: Double = 0 // min
+        public var pausePeriod: Double  = 0 // min
         
         var activeFrequency: Double = 5
         public var frequency: Double? = nil { // Hz
@@ -67,20 +69,20 @@ public class MotionManager: ISensorController {
             super.init()
         }
         
-        public override func set(config: Dictionary<String, Any>) {
-            super.set(config: config)
-            if let period = config["period"] as? Double {
-                self.period = period
-            }
-            
-            if let threshold = config ["threshold"] as? Double {
-                self.threshold = threshold
-            }
-            
-            if let frequency = config["frequency"] as? Double {
-                self.frequency = frequency
-            }
-        }
+//        public override func set(config: Dictionary<String, Any>) {
+//            super.set(config: config)
+//            if let period = config["period"] as? Double {
+//                self.period = period
+//            }
+//            
+//            if let threshold = config ["threshold"] as? Double {
+//                self.threshold = threshold
+//            }
+//            
+//            if let frequency = config["frequency"] as? Double {
+//                self.frequency = frequency
+//            }
+//        }
         
         public func apply(closure: (_ config: MotionManager.Config ) -> Void) -> Self {
             closure(self)
@@ -194,11 +196,14 @@ public class MotionManager: ISensorController {
             } else {
                 
                 self.motionManager.startAccelerometerUpdates(to: opQueue) { (accelData, error) in
+                    
+                    if false == self.collectingData() { return }
+                    
                     if let dataAcc = accelData {
                         self.config.accelerometerObserver?.onDataChanged(data: AccelerometerData(dataAcc.acceleration))
                     }
                     self.runCount += 1
-                    print("runCount = \(self.runCount)")
+                    //("runCount = \(self.runCount)")
                     if self.runCount > Double(self.config.activeFrequency) * self.config.sensorTimerDataStoreInterval {
                         self.runCount = 0
                         self.config.sensorTimerDelegate?.timeToStore()
@@ -220,6 +225,8 @@ public class MotionManager: ISensorController {
         if config.motionObserver != nil {
             self.motionManager.startDeviceMotionUpdates(using: CMAttitudeReferenceFrame.xArbitraryCorrectedZVertical, to: opQueue) { (deviceMotion, error) in
 
+                if false == self.collectingData() { return }
+                
                 if let dataAcc = self.motionManager.accelerometerData {
                     self.config.accelerometerObserver?.onDataChanged(data: AccelerometerData(dataAcc.acceleration))
                 }
@@ -230,7 +237,7 @@ public class MotionManager: ISensorController {
                     self.config.gyroObserver?.onDataChanged(data: GyroscopeData(dataGyro.rotationRate))
                 }
                 if let dataMotion = deviceMotion {
-                    self.config.motionObserver?.onDataChanged(data: MotionData(dataMotion))
+                    self.config.motionObserver?.onDataChanged(data: MotionData(dataMotion, timeInterval: Date().timeIntervalSince1970))
                 }
                 
                 self.runCount += 1
@@ -241,6 +248,40 @@ public class MotionManager: ISensorController {
             }
         }
         
+    }
+    
+    private func collectingData() -> Bool {
+        let currentTimeInterval = Date().timeIntervalSince1970
+        
+        if self.config.pausePeriod > 0 {
+            if self.lastSavedTimeStamp < 1 {
+                //("data collection started %@", Date())
+                self.lastSavedTimeStamp = currentTimeInterval
+            }
+            // we should pause after 'collectionPeriod' minutes of data collection
+            if self.isCollecting {
+                if currentTimeInterval > self.lastSavedTimeStamp + (self.config.collectionPeriod * 60) {
+                    self.isCollecting = false
+                    self.lastSavedTimeStamp = currentTimeInterval
+                    //("data collection paused %@", Date())
+                    return false
+                } else {
+                    
+                }
+            }
+            // we should resume after 'pausePeriod' minutes of idle
+            else {
+                if currentTimeInterval > self.lastSavedTimeStamp + (self.config.pausePeriod * 60) {
+                    self.isCollecting = true
+                    self.lastSavedTimeStamp = currentTimeInterval
+                    //("data collection resumed %@", Date())
+                } else {
+                    return false
+                }
+            }
+        }
+        print("collecting data %@", Date())
+        return true
     }
 }
 #endif
