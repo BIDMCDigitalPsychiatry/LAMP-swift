@@ -10,7 +10,7 @@ public enum SensorType: LampDataKeysProtocol {
         case logout = "logout"
         case logs = "log"
         case diagnostic = "diagnostic"
-        case lowpowermode
+        case lowpowermode = "lowpowermode"
     }
     
     public struct NearbyDevicetype {
