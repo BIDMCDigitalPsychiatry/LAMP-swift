@@ -280,7 +280,6 @@ public class MotionManager: ISensorController {
                 }
             }
         }
-        print("collecting data %@", Date())
         return true
     }
 }
