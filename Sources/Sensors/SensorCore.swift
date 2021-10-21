@@ -91,50 +91,6 @@ public class SensorManager {
         sensors.append(sensor)
     }
     
-    
-//    public func removeSensors(with type: AnyClass){
-//        for sensor in sensors {
-//            if let index = sensors.firstIndex(of: sensor) {
-//                if type(of: sensor) == type(of: type) {
-//                    sensors.remove(at: index)
-//                }
-//            }
-//        }
-//    }
-    
-//    public func removeSensor(id:String){
-//        for sensor in sensors {
-//            if let index = sensors.firstIndex(of: sensor) {
-//                if sensor.id == id {
-//                    sensors.remove(at: index)
-//                }
-//            }
-//        }
-//    }
-//    
-//    public func getSensor(with sensor: ISensorController) -> ISensorController? {
-//        for s in sensors {
-//            if s == sensor {
-//                return s
-//            }
-//        }
-//        return nil
-//    }
-    
-//    public func getSensors(with type: AnyClass ) -> [LampSensorCore]?{
-//        var foundSensors:Array<LampSensorCore> = []
-//        for sensor in sensors {
-//            if sensor is type(of: type) {
-//                foundSensors.append(sensor)
-//            }
-//        }
-//        if foundSensors.count == 0 {
-//            return nil
-//        }else{
-//            return foundSensors
-//        }
-//    }
-    
     public func isExist(with id:String) -> Bool {
         for sensor in sensors {
             if sensor.id == id {
@@ -163,6 +119,10 @@ public class SensorManager {
         for sensor in sensors {
             sensor.stop()
         }
+    }
+    
+    public func clear() {
+        sensors.removeAll()
     }
 }
 
