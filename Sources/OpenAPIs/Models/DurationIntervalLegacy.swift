@@ -23,6 +23,7 @@ public struct DurationIntervalLegacy: Codable {
         case bimonthly
         case monthly
         case custom
+        case fortnightly //every 14 days
         case none
     }
 
@@ -39,6 +40,17 @@ public struct DurationIntervalLegacy: Codable {
         case customTimes = "custom_time"
         case time
         case notificationId = "notification_ids"
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        startDate = try? container.decodeIfPresent(Date.self, forKey: .startDate)
+        time = try? container.decodeIfPresent(Date.self, forKey: .time)
+        customTimes = try? container.decodeIfPresent([Date].self, forKey: .customTimes)
+        notificationId = try? container.decodeIfPresent([Int64].self, forKey: .notificationId)
+        if let repeatinterval = try? container.decodeIfPresent(String.self, forKey: .repeatType), let rtype = RepeatType(rawValue: repeatinterval) {
+            repeatType = rtype
+        }
     }
 
     public init(repeatType: RepeatType?, startDate: Date?, time: Date?, customTimes: [Date]?, notificationId: [Int64]?) {
