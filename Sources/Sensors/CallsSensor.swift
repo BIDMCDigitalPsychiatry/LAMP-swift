@@ -1,7 +1,7 @@
 #if !os(watchOS)
 import CallKit
 
-public protocol CallsObserver: class {
+public protocol CallsObserver: AnyObject {
     /**
      * Callback when a call event is recorded (received, made, missed)
      *
@@ -176,7 +176,7 @@ extension CallsSensor: CXCallObserverDelegate {
             let now = Date()
             let data = CallsData()
             data.timestamp = Date().timeIntervalSince1970 * 1000
-            data.trace = uwLastCallEvent.uuid.uuidString
+            //data.trace = uwLastCallEvent.uuid.uuidString
             data.duration = Int64(now.timeIntervalSince1970 - uwLastCallEventTime.timeIntervalSince1970)
             data.type = uwLastCallEventType.stringValue
 
