@@ -2,7 +2,7 @@
 import Foundation
 import UIKit
 
-public protocol ScreenStateObserver: class {
+public protocol ScreenStateObserver: AnyObject {
     func onDataChanged(data: ScreenStateData)
 }
 
@@ -33,12 +33,15 @@ public class ScreenSensor: ISensorController {
             let screnState: ScreenState
             if UIApplication.shared.isProtectedDataAvailable {
                 
-                if UIScreen.main.brightness == 0.0 {
-                    screnState = .screen_off
+                if self?.latestScreenState == .screen_locked {
+                    screnState = .screen_unlocked
                 } else {
-                    screnState = .screen_on
+                    if UIScreen.main.brightness == 0.0 {
+                        screnState = .screen_off
+                    } else {
+                        screnState = .screen_on
+                    }
                 }
-                //ScreenStateData(screenState: .screen_unlocked)
             } else {
                 screnState = .screen_locked
             }

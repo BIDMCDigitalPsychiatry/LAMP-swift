@@ -32,7 +32,8 @@ public enum SensorType: LampDataKeysProtocol {
     //case lamp_calls
     //case lamp_gyroscope
     //case lamp_magnetometer
-    case lamp_screen_state
+    case lamp_screen_state //keeping this for backward compatibility. lamp_device_state is the new name
+    case lamp_device_state
     case lamp_segment
     //case lamp_sms
     //case lamp_wifi
@@ -100,6 +101,8 @@ public enum SensorType: LampDataKeysProtocol {
             return "lamp.activity_recognition"
         case .lamp_accelerometer:
             return "lamp.accelerometer"
+        case .lamp_device_state:
+            return "lamp.device_state"
         }
     }
 }
