@@ -57,8 +57,7 @@ public class BatteryState {
     #endif
     public func batteryLevel() -> Float? {
         #if os(iOS)
-        let level = UIDevice.current.batteryLevel
-        return level > 0 ? (level * 100) : level
+        return UIDevice.current.batteryLevel
         #else
         return nil
         #endif
