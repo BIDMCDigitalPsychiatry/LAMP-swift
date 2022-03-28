@@ -43,7 +43,7 @@ public class LocationsSensor: NSObject, ISensorController {
         public var frequency: Double? = nil { // Hz
             didSet {
                 guard let frquenctValue = frequency else { return }
-                activeFrequency = min(frquenctValue, 100.0)
+                activeFrequency = min(frquenctValue, 5.0)
             }
         }
         

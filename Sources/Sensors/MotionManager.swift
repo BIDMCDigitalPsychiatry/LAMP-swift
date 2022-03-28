@@ -48,7 +48,7 @@ public class MotionManager: ISensorController {
         public var frequency: Double? = nil { // Hz
             didSet {
                 guard let frquenctValue = frequency, frquenctValue > 0.0 else { return }
-                activeFrequency = min(frquenctValue, 100.0)
+                activeFrequency = min(frquenctValue, 5.0)
             }
         }
         /**
