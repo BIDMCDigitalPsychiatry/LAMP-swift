@@ -3,7 +3,7 @@ targets:
   LAMP:
     type: framework
     platform: iOS
-    deploymentTarget: "10.0"
+    deploymentTarget: "14.0"
     sources: [LAMP]
     info:
       path: ./Info.plist
