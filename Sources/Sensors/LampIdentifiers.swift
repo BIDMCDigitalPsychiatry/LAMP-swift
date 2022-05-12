@@ -47,7 +47,7 @@ public enum SensorType: LampDataKeysProtocol {
     //case lamp_avgActivePace
     //case lamp_distance
     
-    
+    case lamp_sensorkit_visit
     
     public var lampIdentifier: String {
         switch self {
@@ -103,6 +103,8 @@ public enum SensorType: LampDataKeysProtocol {
             return "lamp.accelerometer"
         case .lamp_device_state:
             return "lamp.device_state"
+        case .lamp_sensorkit_visit:
+            return "lamp.visits"
         }
     }
 }
