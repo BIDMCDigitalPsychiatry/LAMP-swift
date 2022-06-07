@@ -15,6 +15,13 @@ public protocol SensorKitObserver: AnyObject {
 
 public class SRSensorLoader {
     
+    struct Config {
+        var intervalMilliSeconds: Double //in milliseconds
+        init(frequency: Double) {
+            self.intervalMilliSeconds = frequency > 0 ? (1.0 / frequency * 1000) : 1000
+        }
+    }
+    
     private var allConfiguredSensors: [SRSensor]?
     private lazy var delegate: SRSensorDelegate = { SRSensorDelegate() }()
     public static var allSensors: [SRSensor] {
@@ -39,11 +46,15 @@ public class SRSensorLoader {
         }
     }
     
-    public init(observer: SensorKitObserver) {
-        delegate.callbackdelegate = observer
-    }
-    public init(_ sensorsToCollect: [String]) {
+    public init(_ sensorsToCollect: [String], frquencySettings: [String: Double]) {
+        var frequncyDict = frquencySettings
         allConfiguredSensors = SRSensor.getSRSensorsFrom(identifiers: sensorsToCollect)
+        
+        //only for ambient_light set default-frequency = 1 (1 record per second)
+        if nil == frquencySettings[SRSensor.ambientLightSensor.lampIdentifier] {
+            frequncyDict[SRSensor.ambientLightSensor.lampIdentifier] = 1.0
+        }
+        delegate.frequencySettings = frequncyDict.mapValues({Config(frequency: $0)})
     }
     public func removeSavedTimestamps() {
         let userDefaults = UserDefaults.standard

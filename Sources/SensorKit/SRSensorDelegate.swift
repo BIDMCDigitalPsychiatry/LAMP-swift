@@ -14,6 +14,8 @@ class SRSensorDelegate: NSObject, SRSensorReaderDelegate {
     
     weak var callbackdelegate: SensorKitObserver?
     
+    var frequencySettings: [String: SRSensorLoader.Config]?
+    
     private func processResult(_ result: SRFetchResult<AnyObject>, sensor: SRSensor) {
         
         guard let sample = result.sample as? Encodable, let json = sample.convertToDict else { return }
@@ -24,12 +26,13 @@ class SRSensorDelegate: NSObject, SRSensorReaderDelegate {
     
     func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, didFetchResult result: SRFetchResult<AnyObject>) -> Bool {
         
-//        if reader.sensor == .ambientLightSensor {
-//            let diffSeconds = NSDate(srAbsoluteTime: result.timestamp).timeIntervalSince1970 - SRSensor.startDateOf(sensor: reader.sensor).timeIntervalSince1970
-//            if diffSeconds <= 1 {
-//                return true
-//            }
-//        }
+        if let intervalInMillli = frequencySettings?[reader.sensor.lampIdentifier]?.intervalMilliSeconds {
+            let diffMilliSeconds = NSDate(srAbsoluteTime: result.timestamp).timeIntervalInMilli - SRSensor.startDateOf(sensor: reader.sensor).timeIntervalInMilli
+            if diffMilliSeconds < intervalInMillli {
+                return true
+            }
+        }
+        
         processResult(result, sensor: reader.sensor)
         SRSensor.setStartDate(NSDate(srAbsoluteTime: result.timestamp) as Date, sensor: reader.sensor)
         return true
@@ -105,5 +108,18 @@ class SRSensorDelegate: NSObject, SRSensorReaderDelegate {
         print("fetchDevicesDidFailWithError \(error.localizedDescription)")
     }
 }
+
+extension NSDate {
+    var timeIntervalInMilli: Double {
+        timeIntervalSince1970 * 1000.0
+    }
+}
+
+extension Date {
+    var timeIntervalInMilli: Double {
+        timeIntervalSince1970 * 1000.0
+    }
+}
+
 
 #endif
