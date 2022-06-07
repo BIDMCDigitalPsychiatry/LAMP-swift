@@ -2,15 +2,18 @@
 //  File.swift
 //  mindlamp
 //
-//  Created by Jijo Pulikkottil on 10/05/22.
+//  Created by ZCO Engineer on 10/05/22.
 //
 #if !os(watchOS)
 import Foundation
 import SensorKit
 import Speech
 
-protocol SensorKitDataJSON {
-    func toJSONDict() -> [String: Any]?
+extension Encodable {
+  var convertToDict: [String: Any]? {
+    guard let data = try? JSONEncoder().encode(self) else { return nil }
+    return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+  }
 }
 
 extension SRWristDetection: Encodable {
@@ -187,7 +190,7 @@ extension SFSpeechRecognitionMetadata: Encodable {
         case speakingRate
         case speechDuration
         case speechStartTimestamp
-        //var voiceAnalytics:
+        //case voiceAnalytics
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -196,6 +199,7 @@ extension SFSpeechRecognitionMetadata: Encodable {
         try container.encode(speakingRate, forKey: .speakingRate)
         try container.encode(speechDuration, forKey: .speechDuration)
         try container.encode(speechStartTimestamp, forKey: .speechStartTimestamp)
+        //try container.encode(voiceAnalytics, forKey: .voiceAnalytics)
     }
 }
 

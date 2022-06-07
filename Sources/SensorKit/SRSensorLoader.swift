@@ -2,34 +2,72 @@
 //  SensorLoader.swift
 //  mindlamp
 //
-//  Created by Jijo Pulikkottil on 06/05/22.
+//  Created by ZCO Engineer on 06/05/22.
 //
 #if !os(watchOS)
 import Foundation
 import SensorKit
 
 public protocol SensorKitObserver: AnyObject {
-    func onSensorFetch(for type: String, model: SRSensorModel)
+    func onSensorFetch(_ fetchedData: SensorKitEvent)
+    func onSensorKitError(_ errType: Error)
 }
 
 public class SRSensorLoader {
     
-    private var allSensors: [SRSensor] = [.ambientLightSensor, .deviceUsageReport]
+    private var allConfiguredSensors: [SRSensor]?
     private lazy var delegate: SRSensorDelegate = { SRSensorDelegate() }()
+    public static var allSensors: [SRSensor] {
+        let sensors: [SRSensor] = [.deviceUsageReport, .ambientLightSensor, .phoneUsageReport, .messagesUsageReport, .visits, .onWristState]
+        //.keyboardMetrics,
+//        if #available(iOS 15.0, *) {
+//            sensors.append(.siriSpeechMetrics)
+//            sensors.append(.telephonySpeechMetrics)
+//        }
+        return sensors
+    }
     
-    lazy var allSensorReaders: [SRSensorReader] = { allSensors.map { createSensorReader($0) } }()
+    public static var allLampIdentifiers: [String] {
+        return allSensors.map {$0.lampIdentifier}
+    }
     
-    func fetchData(from: Date, to: Date) {
+    lazy var allSensorReaders: [SRSensorReader]? = { allConfiguredSensors?.map { createSensorReader($0) } }()
+    
+    public var observer: SensorKitObserver? {
+        didSet {
+            delegate.callbackdelegate = observer
+        }
+    }
+    
+    public init(observer: SensorKitObserver) {
+        delegate.callbackdelegate = observer
+    }
+    public init(_ sensorsToCollect: [String]) {
+        allConfiguredSensors = SRSensor.getSRSensorsFrom(identifiers: sensorsToCollect)
+    }
+    public func removeSavedTimestamps() {
+        let userDefaults = UserDefaults.standard
+        SRSensorLoader.allSensors.forEach { (sensor) in
+            let key = sensor.dateAccessKey
+            userDefaults.removeObject(forKey: key)
+        }
+    }
+    public func fetchData() {
         
-        let fromTime = NSDate(timeIntervalSince1970: from.timeIntervalSince1970).srAbsoluteTime
-        let toTime = NSDate(timeIntervalSince1970: to.timeIntervalSince1970).srAbsoluteTime
-        
-        let request = SRFetchRequest()
-        request.from = fromTime
-        request.to = toTime
-        
-        allSensorReaders.forEach { $0.fetch(request) }
+        allSensorReaders?.filter { $0.authorizationStatus == .authorized }.forEach({ reader in
+            
+            let fromDate = SRSensor.startDateOf(sensor: reader.sensor)
+            let toDate = Date()
 
+            let fromAbsTime = NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970).srAbsoluteTime
+            let toAbsTime = NSDate(timeIntervalSince1970: toDate.timeIntervalSince1970).srAbsoluteTime
+            
+            let request = SRFetchRequest()
+            request.from = fromAbsTime
+            request.to = toAbsTime
+            
+            reader.fetch(request)
+        })
     }
     
     // Helper functions
@@ -42,12 +80,16 @@ public class SRSensorLoader {
     // Displays the authorization approval prompt.
     private func requestAuthorization() {
         
-        let sensorsToRequest = Set(allSensorReaders.filter { $0.authorizationStatus != .authorized }.map{ $0.sensor })
+        guard let sensorsToAuthrize = (allSensorReaders?.filter { $0.authorizationStatus != .authorized })?.map({ $0.sensor }), sensorsToAuthrize.count > 0 else {
+            return
+        }
+        let sensorsToRequest = Set(sensorsToAuthrize)
         
         if sensorsToRequest.count > 0 {
             SRSensorReader.requestAuthorization(sensors: sensorsToRequest) { (error: Error?) in
                 if let error = error {
-                    fatalError("Sensor authorization failed due to: \(error)")
+                    print("Sensor authorization failed due to: \(error.localizedDescription)")
+                    self.observer?.onSensorKitError(error)
                 } else {
                     print("""
                         User dismissed the authorization prompt.
@@ -63,14 +105,14 @@ extension SRSensorLoader: ISensorController {
     
     public func start() {
         
-        allSensorReaders.filter { $0.authorizationStatus == .authorized }.forEach {$0.startRecording()}
-        
+        allSensorReaders?.filter { $0.authorizationStatus == .authorized }.forEach {$0.startRecording()}
         requestAuthorization()
+
     }
     
     public func stop() {
         
-        allSensorReaders.filter { $0.authorizationStatus == .authorized }.forEach {$0.stopRecording()}
+        allSensorReaders?.filter { $0.authorizationStatus == .authorized }.forEach {$0.stopRecording()}
 
     }
 }
