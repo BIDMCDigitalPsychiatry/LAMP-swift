@@ -1,10 +1,11 @@
 import CoreLocation
+import UIKit
 
-public protocol LocationsObserver: class {
+public protocol LocationsObserver: AnyObject {
     func onError(_ errType: LocationErrorType)
 }
 
-public protocol LocationsDataObserver: class {
+public protocol LocationsDataObserver: AnyObject {
     func onLocationChanged(data: LocationsData)
 }
 
@@ -83,8 +84,18 @@ public class LocationsSensor: NSObject, ISensorController {
             config.sensorObserver?.onError(LocationErrorType.notEnabled)
             return
         }
+        let status: CLAuthorizationStatus
+        #if os(iOS)
+        status = locationManager.authorizationStatus
+        #else
+        if #available(watchOS 7.0, *) {
+            status = locationManager.authorizationStatus
+        } else {
+            status = CLLocationManager.authorizationStatus()
+        }
+        #endif
         
-        switch CLLocationManager.authorizationStatus() {
+        switch status {
         case .notDetermined:
             // Request when-in-use authorization initially
             locationManager.requestAlwaysAuthorization()
