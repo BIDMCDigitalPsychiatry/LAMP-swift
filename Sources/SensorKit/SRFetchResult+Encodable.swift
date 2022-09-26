@@ -101,6 +101,7 @@ extension SRDeviceUsageReport: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(duration, forKey: .duration)
+        try container.encode(totalScreenWakes, forKey: .totalScreenWakes)
         try container.encode(totalUnlocks, forKey: .totalUnlocks)
         try container.encode(totalUnlockDuration, forKey: .totalUnlockDuration)
     }
