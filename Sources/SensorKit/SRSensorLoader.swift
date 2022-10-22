@@ -68,14 +68,11 @@ public class SRSensorLoader {
         allSensorReaders?.filter { $0.authorizationStatus == .authorized }.forEach({ reader in
             
             let fromDate = SRSensor.startDateOf(sensor: reader.sensor)
-            let toDate = Date()
+            let toDate = SRAbsoluteTime.current()
 
-            let fromAbsTime = NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970).srAbsoluteTime
-            let toAbsTime = NSDate(timeIntervalSince1970: toDate.timeIntervalSince1970).srAbsoluteTime
-            
             let request = SRFetchRequest()
-            request.from = fromAbsTime
-            request.to = toAbsTime
+            request.from = fromDate
+            request.to = toDate
             
             reader.fetch(request)
         })

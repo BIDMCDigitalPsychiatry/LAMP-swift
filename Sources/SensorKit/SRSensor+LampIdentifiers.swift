@@ -44,18 +44,21 @@ extension SRSensor: LampDataKeysProtocol {
         }
     }
     
-    static func startDateOf(sensor: SRSensor) -> Date {
+    static func startDateOf(sensor: SRSensor) -> SRAbsoluteTime {
         let key = sensor.dateAccessKey
-        if let startDate = (UserDefaults.standard.object(forKey: key) as? Date) {
+        if let startDate = (UserDefaults.standard.object(forKey: key) as? SRAbsoluteTime) {
             return startDate
-        } else {
-            let startDate = Date().pastTenMinutes
+        } else if let startDate = (UserDefaults.standard.object(forKey: key) as? Date) {
+            return (startDate as NSDate).srAbsoluteTime
+        }
+        else {
+            let startDate = (Date().pastTenMinutes as NSDate).srAbsoluteTime
             setStartDate(startDate, sensor: sensor)
             return startDate
         }
     }
     
-    static func setStartDate(_ date: Date, sensor: SRSensor) {
+    static func setStartDate(_ date: SRAbsoluteTime, sensor: SRSensor) {
         let key = sensor.dateAccessKey
         UserDefaults.standard.set(date, forKey: key)
     }

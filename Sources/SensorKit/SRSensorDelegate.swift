@@ -26,15 +26,16 @@ class SRSensorDelegate: NSObject, SRSensorReaderDelegate {
     
     func sensorReader(_ reader: SRSensorReader, fetching fetchRequest: SRFetchRequest, didFetchResult result: SRFetchResult<AnyObject>) -> Bool {
         
+        let timestamp = result.timestamp
         if let intervalInMillli = frequencySettings?[reader.sensor.lampIdentifier]?.intervalMilliSeconds {
-            let diffMilliSeconds = NSDate(srAbsoluteTime: result.timestamp).timeIntervalInMilli - SRSensor.startDateOf(sensor: reader.sensor).timeIntervalInMilli
+            let diffMilliSeconds = NSDate(srAbsoluteTime: timestamp).timeIntervalInMilli - NSDate(srAbsoluteTime: SRSensor.startDateOf(sensor: reader.sensor)).timeIntervalInMilli
             if diffMilliSeconds < intervalInMillli {
                 return true
             }
         }
         
         processResult(result, sensor: reader.sensor)
-        SRSensor.setStartDate(NSDate(srAbsoluteTime: result.timestamp) as Date, sensor: reader.sensor)
+        SRSensor.setStartDate(timestamp, sensor: reader.sensor)
         return true
     }
 
