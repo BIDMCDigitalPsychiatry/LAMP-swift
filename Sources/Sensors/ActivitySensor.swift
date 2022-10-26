@@ -12,7 +12,7 @@ public class ActivityData {
     }
 }
 
-public protocol ActivitySensorObserver: class {
+public protocol ActivitySensorObserver: AnyObject {
     func onDataChanged(data: ActivityData)
 }
 

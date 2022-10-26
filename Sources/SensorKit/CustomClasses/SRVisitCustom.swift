@@ -15,7 +15,7 @@ class SRVisitCustom: Encodable {
     var arrivalDateInterval: DateIntervalCustom
     var departureDateInterval: DateIntervalCustom
     var locationCategory: Int
-    var locationCategoryTextRepresentable: String?
+    var locationCategoryRepresentation: String?
     var identifier: UUID
     
     init(_ visit: SRVisit) {
@@ -23,7 +23,7 @@ class SRVisitCustom: Encodable {
         self.arrivalDateInterval = DateIntervalCustom(visit.arrivalDateInterval)
         self.departureDateInterval = DateIntervalCustom(visit.departureDateInterval)
         self.locationCategory = visit.locationCategory.rawValue
-        self.locationCategoryTextRepresentable = visit.locationCategory.stringValue
+        self.locationCategoryRepresentation = visit.locationCategory.stringValue
         self.identifier = visit.identifier
     }
 }

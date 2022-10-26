@@ -2,7 +2,7 @@
 import Foundation
 import HealthKit
 
-public protocol LMHealthKitSensorObserver: class {
+public protocol LMHealthKitSensorObserver: AnyObject {
     func onHKAuthorizationStatusChanged(success: Bool, error: Error?)
     func onHKDataFetch(for type: String, error: Error?)
 }

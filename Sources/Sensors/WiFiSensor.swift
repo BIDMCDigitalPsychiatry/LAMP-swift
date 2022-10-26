@@ -12,7 +12,7 @@ public class WiFiDeviceData {
 
 }
 
-public protocol WiFiObserver: class {
+public protocol WiFiObserver: AnyObject {
     func onWiFiAPDetected(data: WiFiScanData)
     func onWiFiDisabled()
     func onWiFiScanStarted()

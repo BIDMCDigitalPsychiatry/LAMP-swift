@@ -12,16 +12,16 @@ import SensorKit
 class SRWristDetectionCustom: Encodable {
     var onWrist: Bool
     var wristLocation: Int
-    var wristLocationTextRepresentable: String?
+    var wristLocationRepresentation: String?
     var crownOrientation: Int
-    var crownOrientationTextRepresentable: String?
+    var crownOrientationRepresentation: String?
     
     init (_ wristDetection: SRWristDetection) {
         self.onWrist = wristDetection.onWrist
         self.wristLocation = wristDetection.wristLocation.rawValue
-        self.wristLocationTextRepresentable = wristDetection.wristLocation.stringValue
+        self.wristLocationRepresentation = wristDetection.wristLocation.stringValue
         self.crownOrientation = wristDetection.crownOrientation.rawValue
-        self.crownOrientationTextRepresentable = wristDetection.crownOrientation.stringValue
+        self.crownOrientationRepresentation = wristDetection.crownOrientation.stringValue
     }
 }
 

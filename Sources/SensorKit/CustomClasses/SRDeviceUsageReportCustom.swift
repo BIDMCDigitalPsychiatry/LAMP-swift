@@ -62,12 +62,12 @@ extension SRDeviceUsageReportCustom {
     class NotificationUsageCustom: Encodable {
         var bundleIdentifier: String?
         var event: Int
-        var eventTextRepresentable: String?
+        var eventRepresentation: String?
         
         init(_ notificationUsage: SRDeviceUsageReport.NotificationUsage) {
             self.bundleIdentifier = notificationUsage.bundleIdentifier
             self.event = notificationUsage.event.rawValue
-            self.eventTextRepresentable = notificationUsage.event.stringValue
+            self.eventRepresentation = notificationUsage.event.stringValue
         }
     }
 }
@@ -111,13 +111,13 @@ extension SRDeviceUsageReportCustom {
 class SRTextInputSessionCustom: Encodable {
     var duration: TimeInterval?
     var sessionType: Int?
-    var sessionTypeTextRepresentable: String?
+    var sessionTypeRepresentation: String?
     
     @available(iOS 15.0, *)
     func setInputSession(_ inputSession: SRTextInputSession) {
         self.duration = inputSession.duration * 1000
         self.sessionType = inputSession.sessionType.rawValue
-        self.sessionTypeTextRepresentable = inputSession.sessionType.stringValue
+        self.sessionTypeRepresentation = inputSession.sessionType.stringValue
     }
 }
 
