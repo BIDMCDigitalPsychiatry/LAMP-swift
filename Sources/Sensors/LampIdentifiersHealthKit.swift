@@ -4,7 +4,7 @@
 //
 //  Created by ZCo Engineer on 14/01/20.
 //
-
+#if !os(macOS)
 import Foundation
 import HealthKit
 
@@ -257,3 +257,4 @@ extension HKCharacteristicTypeIdentifier: LampDataKeysProtocol {
         }
     }
 }
+#endif

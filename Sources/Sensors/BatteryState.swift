@@ -1,5 +1,5 @@
 // mindLAMP
-
+#if !os(macOS)
 import Foundation
 import UIKit
 //https://github.com/orgs/BIDMCDigitalPsychiatry/teams/native-core/discussions/1
@@ -63,5 +63,4 @@ public class BatteryState {
         #endif
     }
 }
-
-
+#endif

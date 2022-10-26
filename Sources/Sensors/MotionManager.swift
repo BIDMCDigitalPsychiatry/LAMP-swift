@@ -5,23 +5,23 @@ import UIKit
 
 //https://developer.apple.com/documentation/coremotion/cmmotionmanager?language=objc
 //https://developer.apple.com/videos/play/wwdc2017/704/ 10:00
-public protocol MotionObserver: class {
+public protocol MotionObserver: AnyObject {
     func onDataChanged(data: MotionData)
 }
 
-public protocol AccelerometerObserver: class {
+public protocol AccelerometerObserver: AnyObject {
     func onDataChanged(data: AccelerometerData)
 }
 
-public protocol GyroscopeObserver: class {
+public protocol GyroscopeObserver: AnyObject {
     func onDataChanged(data: GyroscopeData)
 }
 
-public protocol MagnetometerObserver: class {
+public protocol MagnetometerObserver: AnyObject {
     func onDataChanged(data:MagnetometerData)
 }
 
-public protocol SensorStore: class {
+public protocol SensorStore: AnyObject {
     func timeToStore()
 }
 

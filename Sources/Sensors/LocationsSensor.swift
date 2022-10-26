@@ -1,3 +1,4 @@
+#if !os(macOS)
 import CoreLocation
 import UIKit
 
@@ -243,3 +244,4 @@ extension CLLocation {
         return coordinate.latitude != latest.coordinate.latitude || coordinate.longitude != latest.coordinate.longitude
     }
 }
+#endif
