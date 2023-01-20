@@ -43,7 +43,7 @@ extension SRDeviceUsageReportCustom {
         var textInputSessions: [SRTextInputSessionCustom]?
         
         init(_ applicationUsage: SRDeviceUsageReport.ApplicationUsage) {
-            self.bundleIdentifier = applicationUsage.bundleIdentifier
+            self.bundleIdentifier = applicationUsage.bundleIdentifier ?? "null"
             self.usageTime = applicationUsage.usageTime
             if #available(iOS 15.0, *) {
                 self.reportApplicationIdentifier = applicationUsage.reportApplicationIdentifier
@@ -65,7 +65,7 @@ extension SRDeviceUsageReportCustom {
         var eventRepresentation: String?
         
         init(_ notificationUsage: SRDeviceUsageReport.NotificationUsage) {
-            self.bundleIdentifier = notificationUsage.bundleIdentifier
+            self.bundleIdentifier = notificationUsage.bundleIdentifier ?? "null"
             self.event = notificationUsage.event.rawValue
             self.eventRepresentation = notificationUsage.event.stringValue
         }
