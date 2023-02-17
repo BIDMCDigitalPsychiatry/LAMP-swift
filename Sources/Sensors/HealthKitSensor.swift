@@ -552,6 +552,7 @@ extension LMHealthKitSensor {
             data.endDate   = sample.endDate.timeIntervalSince1970 * 1000
             data.hkIdentifier = typeIdentifier
             data.source = sample.sourceRevision.source.bundleIdentifier
+            data.hkDevice = sample.device?.model
             if let meta = sample.metadata {
                 data.metadata = meta
             }
