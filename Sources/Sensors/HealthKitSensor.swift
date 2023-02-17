@@ -473,8 +473,8 @@ extension LMHealthKitSensor {
                 let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
                 
                 self?.saveQuantityData(samples, for: type)
-                let lastDate = samples.last?.endDate.addingTimeInterval(1)
                 if type != steptype {
+                    let lastDate = samples.last?.endDate.addingTimeInterval(1)
                     self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
                 }
                 // for steptype, the date has been saved inside the saveQuantityData()
@@ -508,7 +508,8 @@ extension LMHealthKitSensor {
                 let predicate1 = HKQuery.predicateForSamples(withStart: savedTimestamp, end: today, options: HKQueryOptions.strictStartDate)
                 let predicate2 = HKQuery.predicateForObjects(from: source)
                 let predicate = NSCompoundPredicate(type: NSCompoundPredicate.LogicalType.and, subpredicates: [predicate1, predicate2])
-                let query = HKSampleQuery(sampleType: stepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { (query, results, error) in
+                let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+                let query = HKSampleQuery(sampleType: stepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { (query, results, error) in
                     if let samples = results as? [HKQuantitySample], samples.count > 0 {
                         self.saveQuantityData(samples, for: stepType)
                     }
@@ -523,8 +524,7 @@ extension LMHealthKitSensor {
     private func saveQuantityData(_ samples: [HKQuantitySample], for type: HKSampleType) {
         let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
         var arrData = [LMHealthKitQuantityData]()
-        let sortedSamples = samples.sorted(by: {$0.startDate < $1.startDate})
-        for sample in sortedSamples {
+        for sample in samples {
             let typeIdentifier = HKQuantityTypeIdentifier(rawValue: sample.quantityType.identifier)
             let data = LMHealthKitQuantityData(hkIdentifier: typeIdentifier)
             // device info
