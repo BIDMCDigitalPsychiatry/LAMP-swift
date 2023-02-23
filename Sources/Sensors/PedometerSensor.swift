@@ -7,6 +7,7 @@ public class PedometerData: LampSensorCoreObject {
     public var value: Double  = 0
     public var type: String?
     public var unit: String?
+    public var source: String?
     
     public var timestamp: Double {
         return endDate
@@ -158,6 +159,7 @@ public class PedometerSensor: ISensorController {
         data.value = value
         data.type = type.rawValue
         data.unit = type.unit
+        data.source = "daily pedometer" //#730
         self.config.sensorObserver?.onPedometerChanged(data: data)
     }
 }
