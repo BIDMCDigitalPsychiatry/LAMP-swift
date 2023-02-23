@@ -33,7 +33,7 @@ class SFSpeechRecognitionMetadataCustom: Encodable {
             var frameDuration: TimeInterval
             
             init(_ feature: SFAcousticFeature) {
-                self.frameDuration = feature.frameDuration * 1000
+                self.frameDuration = feature.frameDuration.toMilliSeconds
             }
         }
         
@@ -61,9 +61,9 @@ class SFSpeechRecognitionMetadataCustom: Encodable {
     init?(_ metadata: SFSpeechRecognitionMetadata?) {
         guard let nonNilMetatdata = metadata else { return nil }
         self.speakingRate = nonNilMetatdata.speakingRate
-        self.averagePauseDuration = nonNilMetatdata.averagePauseDuration * 1000
-        self.speechStartTimestamp = nonNilMetatdata.speechStartTimestamp
-        self.speechDuration = nonNilMetatdata.speechDuration * 1000
+        self.averagePauseDuration = nonNilMetatdata.averagePauseDuration.toMilliSeconds
+        self.speechStartTimestamp = nonNilMetatdata.speechStartTimestamp.toMilliSeconds
+        self.speechDuration = nonNilMetatdata.speechDuration.toMilliSeconds
         self.voiceAnalytics = SFVoiceAnalyticsCustom(nonNilMetatdata.voiceAnalytics)
     }
 }
@@ -92,8 +92,8 @@ class SFTranscriptionSegmentCustom: Encodable {
     init(_ transcriptionSegment: SFTranscriptionSegment) {
         self.substring = transcriptionSegment.substring
         self.substringRange = transcriptionSegment.substringRange
-        self.timestamp = transcriptionSegment.timestamp
-        self.duration = transcriptionSegment.duration * 1000
+        self.timestamp = transcriptionSegment.timestamp.toMilliSeconds
+        self.duration = transcriptionSegment.duration.toMilliSeconds
         self.confidence = transcriptionSegment.confidence
         self.alternativeSubstrings = transcriptionSegment.alternativeSubstrings
     }

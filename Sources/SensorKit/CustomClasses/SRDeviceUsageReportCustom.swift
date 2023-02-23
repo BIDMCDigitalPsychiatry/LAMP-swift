@@ -20,7 +20,7 @@ class SRDeviceUsageReportCustom: Encodable {
     var totalUnlockDuration: TimeInterval
     
     init(_ deviceUsageReport: SRDeviceUsageReport) {
-        self.duration = deviceUsageReport.duration * 1000
+        self.duration = deviceUsageReport.duration.toMilliSeconds
         self.applicationUsageByCategory = Dictionary(uniqueKeysWithValues: deviceUsageReport.applicationUsageByCategory.map({ key, value in
             (key.rawValue, value.map({ApplicationUsageCustom($0)})) }))
         self.notificationUsageByCategory = Dictionary(uniqueKeysWithValues: deviceUsageReport.notificationUsageByCategory.map({ key, value in
@@ -29,7 +29,7 @@ class SRDeviceUsageReportCustom: Encodable {
             (key.rawValue, value.map({WebUsageCustom($0)})) }))
         self.totalScreenWakes = deviceUsageReport.totalScreenWakes
         self.totalUnlocks = deviceUsageReport.totalUnlocks
-        self.totalUnlockDuration = deviceUsageReport.totalUnlockDuration * 1000
+        self.totalUnlockDuration = deviceUsageReport.totalUnlockDuration.toMilliSeconds
     }
 }
 
@@ -44,7 +44,7 @@ extension SRDeviceUsageReportCustom {
         
         init(_ applicationUsage: SRDeviceUsageReport.ApplicationUsage) {
             self.bundleIdentifier = applicationUsage.bundleIdentifier ?? "null"
-            self.usageTime = applicationUsage.usageTime
+            self.usageTime = applicationUsage.usageTime.toMilliSeconds
             if #available(iOS 15.0, *) {
                 self.reportApplicationIdentifier = applicationUsage.reportApplicationIdentifier
                 self.textInputSessions = applicationUsage.textInputSessions.compactMap { textInputSession in
@@ -102,7 +102,7 @@ extension SRDeviceUsageReportCustom {
     class WebUsageCustom: Encodable {
         var totalUsageTime: TimeInterval
         init(_ webUsage: SRDeviceUsageReport.WebUsage) {
-            self.totalUsageTime = webUsage.totalUsageTime
+            self.totalUsageTime = webUsage.totalUsageTime.toMilliSeconds
         }
     }
 }
@@ -115,7 +115,7 @@ class SRTextInputSessionCustom: Encodable {
     
     @available(iOS 15.0, *)
     func setInputSession(_ inputSession: SRTextInputSession) {
-        self.duration = inputSession.duration * 1000
+        self.duration = inputSession.duration.toMilliSeconds
         self.sessionType = inputSession.sessionType.rawValue
         self.sessionTypeRepresentation = inputSession.sessionType.stringValue
     }
