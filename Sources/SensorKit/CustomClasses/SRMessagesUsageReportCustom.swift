@@ -17,7 +17,7 @@ class SRMessagesUsageReportCustom: Encodable {
     var totalUniqueContacts: Int
     
     init(_ messageUsageReport: SRMessagesUsageReport) {
-        self.duration = messageUsageReport.duration * 1000
+        self.duration = messageUsageReport.duration.toMilliSeconds
         self.totalOutgoingMessages = messageUsageReport.totalOutgoingMessages
         self.totalIncomingMessages = messageUsageReport.totalIncomingMessages
         self.totalUniqueContacts = messageUsageReport.totalUniqueContacts

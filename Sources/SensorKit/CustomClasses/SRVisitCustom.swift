@@ -49,7 +49,7 @@ struct DateIntervalCustom: Encodable {
     init(_ dateInterval: DateInterval) {
         self.start = dateInterval.start.timeIntervalInMilli
         self.end = dateInterval.end.timeIntervalInMilli
-        self.duration = dateInterval.duration * 1000
+        self.duration = dateInterval.duration.toMilliSeconds
     }
 }
 #endif

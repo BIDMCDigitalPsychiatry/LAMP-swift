@@ -306,10 +306,14 @@ extension LMHealthKitSensor {
         //        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.stepCount.lampIdentifier) == true {
         //            getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
         //        }
-        
+        let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
         let quantityTypes = healthQuantityTypes
         for type in quantityTypes {
-            healthKitData(for: type, from: lastRecordedDate(for: type))
+            if steptype == type {
+                fetchStepCounts(type)
+            } else {
+                healthKitData(for: type, from: lastRecordedDate(for: type))
+            }
         }
         //
         
@@ -469,8 +473,8 @@ extension LMHealthKitSensor {
                 let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
                 
                 self?.saveQuantityData(samples, for: type)
-                let lastDate = samples.last?.endDate.addingTimeInterval(1)
                 if type != steptype {
+                    let lastDate = samples.last?.endDate.addingTimeInterval(1)
                     self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
                 }
                 // for steptype, the date has been saved inside the saveQuantityData()
@@ -488,6 +492,34 @@ extension LMHealthKitSensor {
         healthStore.execute(quantityQuery)
     }
     
+    private func fetchStepCounts(_ stepType: HKSampleType) {
+        
+        let sourceQuery = HKSourceQuery(sampleType: stepType, samplePredicate: nil) { [weak self]
+            (query, sources, error) in
+            guard let self = self else { return }
+            guard let sources = sources else {
+                self.healthKitData(for: stepType, from: self.lastRecordedDate(for: stepType))
+                return }
+            let today = Date()
+            let group = DispatchGroup()
+            for source in sources {
+                group.enter()
+                let savedTimestamp = self.lastRecordedDate(for: stepType, source: source.bundleIdentifier)
+                let predicate1 = HKQuery.predicateForSamples(withStart: savedTimestamp, end: today, options: HKQueryOptions.strictStartDate)
+                let predicate2 = HKQuery.predicateForObjects(from: source)
+                let predicate = NSCompoundPredicate(type: NSCompoundPredicate.LogicalType.and, subpredicates: [predicate1, predicate2])
+                let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+                let query = HKSampleQuery(sampleType: stepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { (query, results, error) in
+                    if let samples = results as? [HKQuantitySample], samples.count > 0 {
+                        self.saveQuantityData(samples, for: stepType)
+                    }
+                    group.leave()
+                }
+                self.healthStore.execute(query)
+            }
+        }
+        healthStore.execute(sourceQuery)
+    }
     
     private func saveQuantityData(_ samples: [HKQuantitySample], for type: HKSampleType) {
         let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
@@ -515,12 +547,12 @@ extension LMHealthKitSensor {
             if nil != errorUnit {
                 continue
             }
-            
             data.type      = sample.quantityType.identifier
             data.startDate = sample.startDate.timeIntervalSince1970 * 1000
             data.endDate   = sample.endDate.timeIntervalSince1970 * 1000
             data.hkIdentifier = typeIdentifier
             data.source = sample.sourceRevision.source.bundleIdentifier
+            data.hkDevice = sample.device?.model
             if let meta = sample.metadata {
                 data.metadata = meta
             }
@@ -529,10 +561,9 @@ extension LMHealthKitSensor {
                 if true == cachedSteps?.contains(sample.uuid) {
                     continue
                 }
-                arrData.append(data)
-                
                 let savedTimestamp = lastRecordedDate(for: type, source: data.source)
                 if sample.startDate > savedTimestamp {
+                    arrData.append(data)
                     // we are passing startdate to get if there are multipe entries.
                     self.saveLastRecordedDate(sample.startDate, fetchedTime: Date(), for: type, source: data.source)
                 }

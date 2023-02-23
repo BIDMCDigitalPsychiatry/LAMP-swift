@@ -19,7 +19,7 @@ class SRKeyboardMetricsCustom: Encodable {
     var inputModes: [String]?
     
     init(_ keyboardMetrics: SRKeyboardMetrics) {
-        self.duration = keyboardMetrics.duration * 1000
+        self.duration = keyboardMetrics.duration.toMilliSeconds
         self.keyboardIdentifier = keyboardMetrics.keyboardIdentifier
         self.version = keyboardMetrics.version
         self.width = keyboardMetrics.width

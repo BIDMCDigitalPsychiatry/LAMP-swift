@@ -36,6 +36,7 @@ public class LMHealthKitQuantityData: LampSensorCoreObject {
     public var representation: String?  // e.g., 60
     public var unit: String? // e.g., count/min
     public var hkIdentifier: HKQuantityTypeIdentifier
+    public var hkDevice: String?
     
     public init(hkIdentifier: HKQuantityTypeIdentifier) {
         self.hkIdentifier = hkIdentifier

@@ -17,7 +17,7 @@ class SRPhoneUsageReportCustom: Encodable {
     var totalPhoneCallDuration: TimeInterval
     
     init(_ phoneUsageReport: SRPhoneUsageReport) {
-        self.duration = phoneUsageReport.duration * 1000
+        self.duration = phoneUsageReport.duration.toMilliSeconds
         self.totalOutgoingCalls = phoneUsageReport.totalOutgoingCalls
         self.totalIncomingCalls = phoneUsageReport.totalIncomingCalls
         self.totalUniqueContacts = phoneUsageReport.totalUniqueContacts
