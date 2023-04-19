@@ -206,10 +206,10 @@ private extension LMHealthKitSensor {
             } else {
                 if source != nil { // for version compatibility
                     let noSourceKey = String(format: "LMHealthKit_%@_timestamp", type.identifier)
-                    date = userDefaults.object(forKey: noSourceKey) as? Date ?? Date().pastDay
+                    date = userDefaults.object(forKey: noSourceKey) as? Date ?? Date().pastTenMinutes
                     userDefaults.set(date, forKey: key) // set date to key with source
                 } else {
-                    date = Date().pastDay
+                    date = Date().pastTenMinutes
                     userDefaults.set(date, forKey: key)
                 }
             }
@@ -217,7 +217,7 @@ private extension LMHealthKitSensor {
             if let dateExist = userDefaults.object(forKey: key) as? Date {
                 date = dateExist
             } else {
-                date = Date().pastDay
+                date = Date().pastTenMinutes
                 userDefaults.set(date, forKey: key)
             }
         }
@@ -230,7 +230,7 @@ private extension LMHealthKitSensor {
                 removeStepSource(sourceIdentifier)
                 userDefaults.removeObject(forKey: key)
             }
-            return Date().pastDay
+            return Date().pastTenMinutes
         }
         return date
     }
@@ -239,7 +239,7 @@ private extension LMHealthKitSensor {
         let dates = sources.map({lastRecordedDate(for: type, source: $0)})
         let dateMinSaved = dates.min() ?? Date().pastTenMinutes
         //suppose, at first login, if user used device stpes, and then synced wearable steps, but the wearable enddata might be less than the last saved device's endtime.
-        return [Date().pastDay, dateMinSaved].min() ?? Date().pastDay
+        return [Date().pastTenMinutes, dateMinSaved].min() ?? Date().pastTenMinutes
     }
     
     func setSourceForStep(_ source: String) {
@@ -276,9 +276,6 @@ private extension LMHealthKitSensor {
 extension Date {
     var pastTenMinutes: Date {
         return addingTimeInterval(-1.0 * 10.0 * 60.0)// past 10 minutes
-    }
-    var pastDay: Date {
-        return addingTimeInterval(-1 * 1 * 24 * 60 * 60)
     }
 }
 
