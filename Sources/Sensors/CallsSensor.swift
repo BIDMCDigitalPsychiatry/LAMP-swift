@@ -177,7 +177,7 @@ extension CallsSensor: CXCallObserverDelegate {
             let data = CallsData()
             data.timestamp = Date().timeIntervalSince1970 * 1000
             //data.trace = uwLastCallEvent.uuid.uuidString
-            data.duration = Int64(now.timeIntervalSince1970 - uwLastCallEventTime.timeIntervalSince1970)
+            data.duration = now.timeIntervalSince1970.toMilliSeconds - uwLastCallEventTime.timeIntervalSince1970.toMilliSeconds
             data.type = uwLastCallEventType.stringValue
 
             self.config.sensorObserver?.onCall(data: data)
