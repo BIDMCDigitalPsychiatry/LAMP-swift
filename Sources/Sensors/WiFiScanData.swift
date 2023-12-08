@@ -5,7 +5,7 @@
 
 import Foundation
 
-public class WiFiScanData {
+public struct WiFiScanData {
     
     public var timestamp = Date().timeIntervalSince1970 * 1000
     public var bssid: String = ""

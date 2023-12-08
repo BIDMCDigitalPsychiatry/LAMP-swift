@@ -13,105 +13,98 @@ public class WiFiDeviceData {
 }
 
 public protocol WiFiObserver: AnyObject {
-    func onWiFiAPDetected(data: WiFiScanData)
-    func onWiFiDisabled()
-    func onWiFiScanStarted()
-    func onWiFiScanEnded()
+    func onWiFiAPDetected(data: [WiFiScanData])
+//    func onWiFiDisabled()
+////    func onWiFiScanStarted()
+//    func onWiFiScanEnded()
 }
 
 public class WiFiSensor: ISensorController {
 
     public var identifier = "WiFiSensor"
-    public var config = Config()
-    let reachability: Reachability
+    //let reachability: Reachability
+    //public var arrDiscoveredDevices = [WiFiScanData]()
+    public weak var sensorObserver: WiFiObserver?
 
-    public class Config: SensorConfig {
-      
-        public weak var sensorObserver: WiFiObserver?
-
-        public override init() {
-            super.init()
-        }
-        
-        public func apply(closure:(_ config: WiFiSensor.Config) -> Void) -> Self {
-            closure(self)
-            return self
-        }
-        
-        public override func set(config: Dictionary<String, Any>) {
-            super.set(config: config)
-        }
-    }
-    
-    public convenience init(){
-        self.init(WiFiSensor.Config())
-    }
-    
-    public init(_ config: WiFiSensor.Config){
-        self.config = config
-        reachability = try! Reachability()
+    public init(){
+        //reachability = try! Reachability()
     }
     public func start() {
+        startScanning()
     }
     
     public func stop() {
+        sensorObserver = nil
+        stopScanning()
     }
     
     public func stopScanning() {
         
-        reachability.stopNotifier()
+        //reachability.stopNotifier()
     }
     
     public func startScanning() {
-        if self.reachability.connection == .wifi {
-            let networkInfos = self.getNetworkInfos()
-            
-            for info in networkInfos{
-                // send a WiFiScanData via observer
-                let scanData = WiFiScanData.init()
-                //scanData.label = self.CONFIG.label
-                scanData.ssid = info.ssid
-                scanData.bssid = info.bssid
-
-                if let wifiObserver = self.config.sensorObserver {
-                    wifiObserver.onWiFiAPDetected(data: scanData)
-                }
-            }
+        
+        let networkInfos = self.getNetworkInfos()
+        
+        let scandata = networkInfos.map { info in
+            var scanDatum = WiFiScanData.init()
+            scanDatum.ssid = info.ssid
+            scanDatum.bssid = info.bssid
+            return scanDatum
+        }
+        if let observer = self.sensorObserver {
+            observer.onWiFiAPDetected(data: scandata)
         }
         
+//        if self.reachability.connection == .wifi {
+//            let networkInfos = self.getNetworkInfos()
+//            
+//            let scandata = networkInfos.map { info in
+//                var scanDatum = WiFiScanData.init()
+//                scanDatum.ssid = info.ssid
+//                scanDatum.bssid = info.bssid
+//                return scanDatum
+//            }
+//            if let observer = self.sensorObserver {
+//                observer.onWiFiAPDetected(data: scandata)
+//            }
+//        }
+//        
         // start WiFi reachability/unreachable monitoring
-        do{
-            // reachable events
-            reachability.whenReachable = { reachability in
-                switch reachability.connection {
-                case .wifi:
-                    let networkInfos = self.getNetworkInfos()
-                    for info in networkInfos{
-                        // send a WiFiScanData via observer
-                        let scanData = WiFiScanData.init()
-                        //scanData.label = self.CONFIG.label
-                        scanData.ssid = info.ssid
-                        scanData.bssid = info.bssid
-                        if let observer = self.config.sensorObserver {
-                            observer.onWiFiAPDetected(data: scanData)
-                        }
-                        
-                    }
-                    
-                    break
-                case .cellular:
-                    if let observer = self.config.sensorObserver {
-                        observer.onWiFiDisabled()
-                    }
-                    break
-                case .unavailable:
-                    break
-                }
-            }
-            try reachability.startNotifier()
-        } catch {
-            print("WiFiSensor \(error)")
-        }
+//        do{
+//            // reachable events
+//            reachability.whenReachable = { [weak self] reachability in
+//                switch reachability.connection {
+//                case .wifi:
+//                    guard let networkInfos = self?.getNetworkInfos() else {
+//                        self?.sensorObserver?.onWiFiScanEnded()
+//                        return
+//                    }
+//                    
+//                    let scandata = networkInfos.map { info in
+//                        var scanDatum = WiFiScanData.init()
+//                        scanDatum.ssid = info.ssid
+//                        scanDatum.bssid = info.bssid
+//                        return scanDatum
+//                    }
+//                    if let observer = self?.sensorObserver {
+//                        observer.onWiFiAPDetected(data: scandata)
+//                    }
+//                    break
+//                case .cellular:
+//                    if let observer = self?.sensorObserver {
+//                        observer.onWiFiDisabled()
+//                    }
+//                    break
+//                case .unavailable:
+//                    break
+//                }
+//            }
+//            try reachability.startNotifier()
+//        } catch {
+//            print("WiFiSensor \(error)")
+//        }
     }
     
     struct NetworkInfo {
