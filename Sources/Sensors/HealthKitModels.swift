@@ -24,6 +24,30 @@ public class LMHealthKitCharacteristicData: LampSensorCoreObject {
     }
 }
 
+public class LMHealthKitBloodPressureData: LampSensorCoreObject {
+    
+    public var device: [String: Any]?
+    public var source: String?
+    public var startDate: Double?
+    public var endDate: Double?
+    public var metadata: [String: Any]?
+    public var type: String = ""  // eg: HKQuantityTypeIdentifier
+    public var diastolic: Double?  // e.g., 60
+    public var systolic: Double?  // e.g., 60
+    public var representation: String?  // e.g., 60
+    public var unit: String? // e.g., count/min
+    public var hkIdentifier: HKCorrelationTypeIdentifier
+    public var hkDevice: String?
+    
+    public init(hkIdentifier: HKCorrelationTypeIdentifier) {
+        self.hkIdentifier = hkIdentifier
+    }
+
+    public var timestamp: Double {
+        return endDate ?? Double(timestampInternal)
+    }
+}
+
 public class LMHealthKitQuantityData: LampSensorCoreObject {
     
     public var device: [String: Any]?

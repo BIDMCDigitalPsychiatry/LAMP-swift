@@ -90,13 +90,13 @@ public class NearByDevice: NSObject, ISensorController {
     public class Config: SensorConfig {
         
         var minimumInterval: Double {
-            guard let frquecySetByUser = activeFrequency, frquecySetByUser > 0.0 else { return 300 }
+            guard let frquecySetByUser = activeFrequency, frquecySetByUser > 0.0 else { return 300 } 
             return 1.0 / frquecySetByUser
         }
         var activeFrequency: Double?
         public var frequency: Double? = nil { // Hz
             didSet {
-                guard let frquenctValue = frequency else { return }
+                guard let frquenctValue = frequency, frquenctValue > 0.0 else { return }
                 activeFrequency = min(frquenctValue, 1/300.0)
             }
         }

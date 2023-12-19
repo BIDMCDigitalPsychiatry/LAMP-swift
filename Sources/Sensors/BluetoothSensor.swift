@@ -44,7 +44,6 @@ public class LMBluetoothSensor: NSObject, ISensorController {
     // MARK: Variables
     public weak var sensorObserver: LMBluetoothSensorDelegate?
     var centralManager: CBCentralManager?
-    
     // MARK: Methods
     public func start() {
         centralManager = CBCentralManager(delegate: self, queue: nil)
