@@ -35,34 +35,28 @@ public struct LMBluetoothData {
     public var timestamp = Date().timeIntervalSince1970 * 1000
 }
 
+public protocol LMBluetoothSensorDelegate: AnyObject {
+    func onBluetoothDetected(data: LMBluetoothData)
+}
+
 public class LMBluetoothSensor: NSObject, ISensorController {
         
     // MARK: Variables
+    public weak var sensorObserver: LMBluetoothSensorDelegate?
     var centralManager: CBCentralManager?
-    public var arrDiscoveredDevices = [LMBluetoothData]()
-    
     // MARK: Methods
     public func start() {
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
     
     public func stop() {
+        sensorObserver = nil
         centralManager?.stopScan()
     }
     
-    private func scanBluetooth() {
+    func scanBluetooth() {
         let arrCBUUID: [CBUUID]? = nil //targetServiceUUIDs()
         centralManager?.scanForPeripherals(withServices: arrCBUUID, options: nil)
-    }
-    
-    public func latestData() -> LMBluetoothData? {
-        let latest = arrDiscoveredDevices.last
-        resetDevicesArray()
-        return latest
-    }
-    
-    private func resetDevicesArray() {
-        arrDiscoveredDevices.removeAll()
     }
     
     private func targetServiceUUIDs() -> [CBUUID] {
@@ -96,7 +90,17 @@ extension LMBluetoothSensor: CBCentralManagerDelegate {
         switch central.state {
         case .poweredOn:
             scanBluetooth()
-        default:
+        case .unknown:
+            break
+        case .resetting:
+            break
+        case .unsupported:
+            break
+        case .unauthorized:
+            break
+        case .poweredOff:
+            break//stop()
+        @unknown default:
             break
         }
     }
@@ -106,7 +110,7 @@ extension LMBluetoothSensor: CBCentralManagerDelegate {
         data.address = peripheral.identifier.uuidString
         data.name = peripheral.name
         data.rssi = Int(truncating: RSSI)
-        arrDiscoveredDevices.append(data)
+        sensorObserver?.onBluetoothDetected(data: data)
     }
 }
 

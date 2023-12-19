@@ -13,6 +13,17 @@ public protocol LampDataKeysProtocol {
     var lampIdentifier: String {get}
 }
 
+extension HKCorrelationTypeIdentifier: LampDataKeysProtocol {
+    
+    public var lampIdentifier: String {
+        switch self {
+        case .bloodPressure:
+            return "lamp.blood_pressure"
+        default:
+            return "lamp.\(self.rawValue)"
+        }
+    }
+}
 
 extension HKQuantityTypeIdentifier: LampDataKeysProtocol {
     
@@ -33,10 +44,10 @@ extension HKQuantityTypeIdentifier: LampDataKeysProtocol {
         switch self {
         case .stepCount:
             return "lamp.steps"
-        case .bloodPressureSystolic:
-            return "lamp.blood_pressure"
-        case .bloodPressureDiastolic:
-            return "lamp.blood_pressure"
+//        case .bloodPressureSystolic:
+//            return "lamp.blood_pressure"
+//        case .bloodPressureDiastolic:
+//            return "lamp.blood_pressure"
         case .heartRate:
             return "lamp.heart_rate"
         case .height:

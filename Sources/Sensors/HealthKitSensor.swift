@@ -15,6 +15,7 @@ public class LMHealthKitSensor: ISensorController {
     public var healthStore : HKHealthStore
     //public var fetchLimit = 100
     
+    private var arrBPData = [LMHealthKitBloodPressureData]()
     //HKQuantityData
     private var arrQuantityData = [LMHealthKitQuantityData]()
     //HKCategoryData
@@ -39,18 +40,24 @@ public class LMHealthKitSensor: ISensorController {
     var nutritionTypes: [HKQuantityTypeIdentifier] = [.dietaryFatTotal, .dietaryFatPolyunsaturated, .dietaryFatMonounsaturated, .dietaryFatSaturated, .dietaryCholesterol, .dietarySodium, .dietaryCarbohydrates, .dietaryFiber, .dietarySugar, .dietaryEnergyConsumed, .dietaryProtein, .dietaryVitaminA, .dietaryVitaminB6, .dietaryVitaminB12, .dietaryVitaminC, .dietaryVitaminD, .dietaryVitaminE, .dietaryVitaminK, .dietaryCalcium, .dietaryIron, .dietaryThiamin, .dietaryRiboflavin, .dietaryNiacin, .dietaryFolate, .dietaryBiotin, .dietaryPantothenicAcid, .dietaryPhosphorus, .dietaryIodine, .dietaryMagnesium, .dietaryZinc, .dietarySelenium, .dietaryCopper, .dietaryManganese, .dietaryChromium, .dietaryMolybdenum, .dietaryChloride, .dietaryPotassium, .dietaryCaffeine, .dietaryWater]
     
     //add all supported healthkit sensors here
-    public static let healthkitSensors = [HKCategoryTypeIdentifier.sleepAnalysis.lampIdentifier, HKQuantityTypeIdentifier.heartRate.lampIdentifier, HKQuantityTypeIdentifier.bloodPressureDiastolic.lampIdentifier, HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier, HKQuantityTypeIdentifier.bodyTemperature.lampIdentifier, HKQuantityTypeIdentifier.oxygenSaturation.lampIdentifier, HKQuantityTypeIdentifier.bloodGlucose.lampIdentifier, HKQuantityTypeIdentifier.dietaryIron.lampIdentifier, HKQuantityTypeIdentifier.stepCount.lampIdentifier, SensorType.lamp_segment.lampIdentifier, HKQuantityTypeIdentifier.heartRateVariabilitySDNN.lampIdentifier]
+    public static let healthkitSensors = [HKCorrelationTypeIdentifier.bloodPressure.lampIdentifier, HKCategoryTypeIdentifier.sleepAnalysis.lampIdentifier, HKQuantityTypeIdentifier.heartRate.lampIdentifier, HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier, HKQuantityTypeIdentifier.bodyTemperature.lampIdentifier, HKQuantityTypeIdentifier.oxygenSaturation.lampIdentifier, HKQuantityTypeIdentifier.bloodGlucose.lampIdentifier, HKQuantityTypeIdentifier.dietaryIron.lampIdentifier, HKQuantityTypeIdentifier.stepCount.lampIdentifier, SensorType.lamp_segment.lampIdentifier, HKQuantityTypeIdentifier.heartRateVariabilitySDNN.lampIdentifier]
+    
+    var corelationTypes: [HKSampleType] {
+        var correlationTypes = [HKSampleType]()
+        if sensorsToCollect?.contains(HKCorrelationTypeIdentifier.bloodPressure.lampIdentifier) == true {
+            if let bpType = HKQuantityType.correlationType(forIdentifier: HKCorrelationTypeIdentifier.bloodPressure) {
+                correlationTypes.append(bpType)
+            }
+        }
+        return correlationTypes
+    }
     //when ever add new data type, then handle the same in fetchHealthKitQuantityData(), extension HKQuantityTypeIdentifier: LampDataKeysProtocol
-    public lazy var healthQuantityTypes: [HKSampleType] = {
+    public func healthQuantityTypes(isForAuthoroization: Bool) -> [HKSampleType] {
         
         var quantityTypes = [HKSampleType]()
         var identifiers: [HKQuantityTypeIdentifier] = []// [.heartRate, .bloodPressureDiastolic, .bloodPressureSystolic, .respiratoryRate]
         if sensorsToCollect?.contains(HKQuantityTypeIdentifier.heartRate.lampIdentifier) == true {
             identifiers.append(.heartRate)
-        }
-        if sensorsToCollect?.contains(HKQuantityTypeIdentifier.bloodPressureDiastolic.lampIdentifier) == true {
-            identifiers.append(.bloodPressureDiastolic)
-            identifiers.append(.bloodPressureSystolic)
         }
         if sensorsToCollect?.contains(HKQuantityTypeIdentifier.respiratoryRate.lampIdentifier) == true {
             identifiers.append(.respiratoryRate)
@@ -87,8 +94,21 @@ public class LMHealthKitSensor: ISensorController {
                 quantityTypes.append(quantityType)
             }
         }
+        
+        if sensorsToCollect?.contains(HKCorrelationTypeIdentifier.bloodPressure.lampIdentifier) == true {
+            
+            if isForAuthoroization {
+                if let diastolic = HKQuantityType.quantityType(forIdentifier: .bloodPressureDiastolic) {
+                    quantityTypes.append(diastolic)
+                }
+                if let systolic = HKQuantityType.quantityType(forIdentifier: .bloodPressureSystolic) {
+                    quantityTypes.append(systolic)
+                }
+            }
+        }
+        
         return quantityTypes
-    }()
+    }
     
     public lazy var healthCategoryTypes: [HKSampleType] = {
         var arrTypes = [HKSampleType]()
@@ -121,6 +141,7 @@ public class LMHealthKitSensor: ISensorController {
     
     public func clearDataArrays() {
         arrQuantityData.removeAll()
+        arrBPData.removeAll()
         arrCategoryData.removeAll()
         arrWorkoutData.removeAll()
         arrCharacteristicData.removeAll()
@@ -128,7 +149,14 @@ public class LMHealthKitSensor: ISensorController {
     
     public func removeSavedTimestamps() {
         let userDefaults = UserDefaults.standard
-        healthQuantityTypes.forEach { (type) in
+        let allQuantityTypes = healthQuantityTypes(isForAuthoroization: false)
+        allQuantityTypes.forEach { (type) in
+            let key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
+            userDefaults.removeObject(forKey: key)
+        }
+        
+        let allCorrelationTypes = corelationTypes
+        allCorrelationTypes.forEach { (type) in
             let key = String(format: "LMHealthKit_%@_timestamp", type.identifier)
             userDefaults.removeObject(forKey: key)
         }
@@ -144,7 +172,7 @@ private extension LMHealthKitSensor {
             return
         }
         
-        let dataTypes = Set(lampHealthKitTypes())
+        let dataTypes = Set(lampHealthKitTypesForAuth())
         print("dataTypes = \(dataTypes)")
         healthStore.requestAuthorization(toShare: nil, read: dataTypes) { [weak self] (success, error) -> Void in
             if let observer = self?.observer {
@@ -153,10 +181,10 @@ private extension LMHealthKitSensor {
         }
     }
     
-    func lampHealthKitTypes() -> [HKObjectType] {
+    func lampHealthKitTypesForAuth() -> [HKObjectType] {
         var arrSampleTypes = [HKObjectType]()
         
-        arrSampleTypes.append(contentsOf: healthQuantityTypes)
+        arrSampleTypes.append(contentsOf: healthQuantityTypes(isForAuthoroization: true))
         arrSampleTypes.append(contentsOf: healthCategoryTypes)
         arrSampleTypes.append(contentsOf: healthCharacteristicTypes)
         if sensorsToCollect?.contains(SensorType.lamp_segment.lampIdentifier) == true {
@@ -285,6 +313,10 @@ extension LMHealthKitSensor {
         return arrQuantityData
     }
     
+    public func latestBPData() -> [LMHealthKitBloodPressureData]? {
+        return arrBPData
+    }
+    
     public func latestCategoryData() -> [LMHealthKitCategoryData]? {
         return arrCategoryData
     }
@@ -304,15 +336,20 @@ extension LMHealthKitSensor {
         //            getStatisticalData(for: HKQuantityTypeIdentifier.stepCount)
         //        }
         let steptype = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.stepCount)
-        let quantityTypes = healthQuantityTypes
+        
+        let quantityTypes = healthQuantityTypes(isForAuthoroization: false)
         for type in quantityTypes {
-            if steptype == type {
+            if type == steptype {
                 fetchStepCounts(type)
             } else {
                 healthKitData(for: type, from: lastRecordedDate(for: type))
             }
         }
         //
+        
+        for type in corelationTypes {
+            healthKitData(for: type, from: lastRecordedDate(for: type))
+        }
         
         let categoryTypes = healthCategoryTypes
         for type in categoryTypes {
@@ -484,9 +521,97 @@ extension LMHealthKitSensor {
                 self?.saveWorkoutData(samples, for: type)
                 let lastDate = samples.last?.endDate.addingTimeInterval(1)
                 self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
+                
+            } else if let samples = sampleObjects as? [HKCorrelation], samples.count > 0 {
+                
+                self?.saveBPResults(samples)
+                let lastDate = samples.last?.endDate.addingTimeInterval(1)
+                self?.saveLastRecordedDate(lastDate, fetchedTime: today, for: type)
             }
         }
         healthStore.execute(quantityQuery)
+    }
+    
+    
+//    private func readSampleByBloodPressure(_ bpType: HKSampleType, from start: Date) {
+//        
+//        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
+//        let today = Date()
+//        let predicate = HKQuery.predicateForSamples(withStart: start, end: today, options: HKQueryOptions.strictStartDate)
+//        let sampleQuery = HKSampleQuery(sampleType: bpType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) {  [weak self] (sampleQuery, results, error) in
+//            if error != nil {
+//                self?.observer?.onHKDataFetch(for: bpType.identifier, error: error)
+//                return
+//            }
+//            if let dataList = results as? [HKCorrelation], dataList.count > 0 {
+//                
+//                self?.saveBPResults(dataList)
+//            }
+//        }
+//        healthStore.execute(sampleQuery)
+//    }
+    
+    private func saveBPResults(_ results: [HKCorrelation]) {
+        
+        guard let systolicType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureSystolic),
+              let diastolicType = HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.bloodPressureDiastolic) else {
+            return
+        }
+        let bptype = HKQuantityType.correlationType(forIdentifier: HKCorrelationTypeIdentifier.bloodPressure)!
+        let typeIdentifier = HKCorrelationTypeIdentifier.bloodPressure
+        var arrData = [LMHealthKitBloodPressureData]()
+        
+        
+        var unitt = HKUnit.millimeterOfMercury()
+        let queryGroup = DispatchGroup()
+        queryGroup.enter()
+        //var errorUnit: Error?
+        healthStore.preferredUnits(for: [systolicType]) { (dict, err) in
+            if let unit = dict[systolicType] {
+                //data.value     = sample.quantity.doubleValue(for: unit)
+                unitt = unit
+            } else {
+                //errorUnit = err
+            }
+            queryGroup.leave()
+        }
+        
+        
+        for sample in results {
+            
+            if let sysdata = sample.objects(for: systolicType).first as? HKQuantitySample,
+               let diasdata = sample.objects(for: diastolicType).first as? HKQuantitySample {
+                
+                let syssdatavalue = sysdata.quantity.doubleValue(for: unitt)
+                let diasdatavalue = diasdata.quantity.doubleValue(for: unitt)
+                
+                print("syssdatavalue = \(syssdatavalue)")
+                print("diasdatavalue = \(diasdatavalue)")
+             
+                let data = LMHealthKitBloodPressureData(hkIdentifier: typeIdentifier)
+                data.diastolic = diasdatavalue
+                data.systolic = syssdatavalue
+                // device info
+                if let device = sample.device {
+                    let json = device.toDictionary()
+                    data.device = json
+                }
+                data.unit = unitt.unitString
+                data.type      = bptype.identifier
+                data.startDate = sample.startDate.timeIntervalSince1970 * 1000
+                data.endDate   = sample.endDate.timeIntervalSince1970 * 1000
+                data.hkIdentifier = typeIdentifier
+                data.source = sample.sourceRevision.source.bundleIdentifier
+                data.hkDevice = sample.device?.model
+                if let meta = sample.metadata {
+                    data.metadata = meta
+                }
+                arrData.append(data)
+            }
+        }
+        if corelationTypes.contains(bptype) {
+            arrBPData.append(contentsOf: arrData)
+        }
     }
     
     private func fetchStepCounts(_ stepType: HKSampleType) {
@@ -572,14 +697,14 @@ extension LMHealthKitSensor {
         if steptype == type {
             cachedSteps = samples.map({ $0.uuid })
         }
-        if healthQuantityTypes.contains(type) {
+        if healthQuantityTypes(isForAuthoroization: false).contains(type) {
             arrQuantityData.append(contentsOf: arrData)
         }
     }
     
     private func saveCategoryData(_ samples: [HKCategorySample], for type: HKSampleType) {
         
-        if healthCategoryTypes.contains(type) {
+        if healthQuantityTypes(isForAuthoroization: false).contains(type) {
             let arrData = samples.map({ LMHealthKitCategoryData($0) })
             arrCategoryData.append(contentsOf: arrData)
         }
