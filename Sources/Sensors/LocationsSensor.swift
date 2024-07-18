@@ -79,12 +79,19 @@ public class LocationsSensor: NSObject, ISensorController {
     }
     
     public func start() {
-        // Do not start services that aren't available.
-        if false == CLLocationManager.locationServicesEnabled() {
-            // Location services is not available.
-            config.sensorObserver?.onError(LocationErrorType.notEnabled)
-            return
+        let myQueue = DispatchQueue(label:"myOwnQueue")
+        myQueue.async { [weak self] in
+          if CLLocationManager.locationServicesEnabled() {
+            // your code here
+              self?.startScripts()
+          } else {
+              self?.config.sensorObserver?.onError(LocationErrorType.notEnabled)
+              return
+          }
         }
+    }
+
+    func startScripts() {
         let status: CLAuthorizationStatus
         #if os(iOS)
         status = locationManager.authorizationStatus
@@ -113,7 +120,6 @@ public class LocationsSensor: NSObject, ISensorController {
             break
         }
         self.startLocationServices()
-        
     }
     
     public func stop() {
