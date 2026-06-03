@@ -33,6 +33,7 @@ public struct DurationIntervalLegacy: Codable {
     public var time: Date?
     public var customTimes: [Date]?
     public var notificationId: [Int64]?
+    public var notificationMessage: String?
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case repeatType = "repeat_interval"
@@ -40,6 +41,7 @@ public struct DurationIntervalLegacy: Codable {
         case customTimes = "custom_time"
         case time
         case notificationId = "notification_ids"
+        case notificationMessage
     }
     
     public init(from decoder: Decoder) throws {
@@ -51,14 +53,16 @@ public struct DurationIntervalLegacy: Codable {
         if let repeatinterval = try? container.decodeIfPresent(String.self, forKey: .repeatType), let rtype = RepeatType(rawValue: repeatinterval) {
             repeatType = rtype
         }
+        notificationMessage = try? container.decodeIfPresent(String.self, forKey: .notificationMessage)
     }
 
-    public init(repeatType: RepeatType?, startDate: Date?, time: Date?, customTimes: [Date]?, notificationId: [Int64]?) {
+    public init(repeatType: RepeatType?, startDate: Date?, time: Date?, customTimes: [Date]?, notificationId: [Int64]?, notificationMessage: String?) {
         self.repeatType = repeatType
         self.startDate = startDate
         self.time = time
         self.customTimes = customTimes
         self.notificationId = notificationId
+        self.notificationMessage = notificationMessage
     }
 }
 
